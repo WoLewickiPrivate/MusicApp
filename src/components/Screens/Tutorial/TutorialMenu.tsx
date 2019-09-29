@@ -50,7 +50,7 @@ export default class TutorialMenu extends React.Component<Props, State> {
   renderMenuButtons() {
     return this.state.images!.map(imageTable => {
       return (
-        <Fragment>
+        <Fragment key={Math.random() * 1000}>
           <MenuButton
             text={imageTable.text}
             onPress={() =>
