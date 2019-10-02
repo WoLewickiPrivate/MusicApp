@@ -1,15 +1,20 @@
-export default async function(request: string) {
+const get = async (endpoint: string): Promise<Response | null> => {
   try {
-    let response = await fetch('localhost:8080/song', {
-      method: 'POST',
+    const response = await fetch(`https://localhost:3005/${endpoint}`, {
+      method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: request,
+      body: JSON.stringify({
+        firstParam: 'yourValue',
+        secondParam: 'yourOtherValue',
+      }),
     });
-    return response;
+
+    return response.json();
   } catch (error) {
-    console.error(error);
+    console.warn(error);
   }
-}
+};
+export { get };
