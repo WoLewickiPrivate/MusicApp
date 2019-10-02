@@ -1,3 +1,5 @@
+import RNSF from 'react-native-fs';
+
 interface Track {
   deltaTime?: number;
   type?: string;
@@ -24,13 +26,16 @@ interface JsonMIDI {
   readonly tracks: Array<Array<Track>>;
 }
 
-export class midiToJsonConverter {
-  midiToJsonConverter(midiFile: string): string {
-    var fs = require('fs');
-    var midiConverter = require('midi-converter');
-    var midiSong = fs.readFileSync(midiFile, 'binary');
-    var jsonSong = midiConverter.midiToJson(midiSong);
-    return jsonSong;
+export default class midiToJsonConverter {
+  static midiToJsonConverter(midiFile?: string): string {
+    // let fs = require('fs');
+    // let midiConverter = require('midi-converter');
+    // let midiSong = fs.readFileSync(midiFile, 'binary');
+    // let jsonSong = midiConverter.midiToJson(midiSong);
+
+    // return jsonSong;
+
+    return RNSF.MainBundlePath;
   }
 
   getTicksPerBeat(jsonSong: JsonMIDI) {
@@ -58,24 +63,24 @@ export class midiToJsonConverter {
   }
 
   getInfoTrack(jsonSong: JsonMIDI): Array<Track> | undefined {
-    var tracks = this.getTracks(jsonSong);
+    let tracks = this.getTracks(jsonSong);
     if (tracks.length > 0) {
       return tracks[0];
     }
   }
 
   getMelodyTrack(jsonSong: JsonMIDI): Array<Track> | undefined {
-    var tracks = this.getTracks(jsonSong);
+    let tracks = this.getTracks(jsonSong);
     if (tracks.length > 1) {
       return tracks[1];
     }
   }
 
   getFirstTempo(jsonSong: JsonMIDI): number | undefined {
-    var tracks = this.getTracks(jsonSong);
-    var infoTrack = this.getInfoTrack(jsonSong);
+    let tracks = this.getTracks(jsonSong);
+    let infoTrack = this.getInfoTrack(jsonSong);
 
-    var tempoSegment = infoTrack
+    let tempoSegment = infoTrack
       ? infoTrack.find(entry => {
           if (entry.subtype) {
             entry.subtype.toLowerCase() === 'setTempo';
@@ -89,10 +94,10 @@ export class midiToJsonConverter {
   }
 
   getRawMidiTable(jsonSong: JsonMIDI) {
-    var midiTable = Array(100);
+    let midiTable = Array(100);
     midiTable.map(entry => []);
 
-    var melodyTrack = this.getMelodyTrack(jsonSong);
+    let melodyTrack = this.getMelodyTrack(jsonSong);
     if (melodyTrack) {
       melodyTrack.forEach(entry => {
         if (entry.subtype && entry.noteNumber) {

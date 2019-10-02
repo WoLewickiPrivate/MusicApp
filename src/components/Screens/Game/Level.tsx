@@ -1,9 +1,10 @@
 import React, { RefObject } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
+import range from 'just-range';
 
 import Piano from '../../Piano/Piano';
 import Board from './Board';
-import range from 'just-range';
+import MidiToJsonConverter from '../../../MidiUtils/MidiToJsonConverter';
 
 interface Props {
   navigation: Navigation;
@@ -61,6 +62,8 @@ export default class Level extends React.Component<Props, State> {
     }, 10);
 
     this.moveNotes();
+
+    console.warn(MidiToJsonConverter.midiToJsonConverter());
   }
 
   render() {
