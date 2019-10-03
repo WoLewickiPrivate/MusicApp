@@ -8,9 +8,9 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@tonejs/midi": "^2.0.7",
     "expo": "^35.0.0",
     "just-range": "^2.1.0",
-    "midi-converter": "^0.1.5",
     "react": "16.8.3",
     "react-dom": "16.8.3",
     "react-native": "https://github.com/expo/react-native/archive/sdk-35.0.0.tar.gz",
