@@ -32,10 +32,7 @@ export default class midiToJsonConverter {
     // let midiConverter = require('midi-converter');
     // let midiSong = fs.readFileSync(midiFile, 'binary');
     // let jsonSong = midiConverter.midiToJson(midiSong);
-
     // return jsonSong;
-
-    return RNSF.MainBundlePath;
   }
 
   getTicksPerBeat(jsonSong: JsonMIDI) {

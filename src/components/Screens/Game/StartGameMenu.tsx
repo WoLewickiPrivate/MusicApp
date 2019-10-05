@@ -1,63 +1,66 @@
 import React, { Fragment } from 'react';
-import { Text, View, ImageBackground } from 'react-native';
-import styles from '../../../styles/Menu/MenuMainStyle';
+import { Text, View, ImageBackground, Button } from 'react-native';
 
+import { connect } from 'react-redux';
+
+import { RootReducerState } from '../../../redux/RootReducer';
+import styles from '../../../styles/Menu/MenuMainStyle';
 import MenuButton from '../../Buttons/MenuButton';
 import TutorialTexts from '../../../styles/Texts/TutorialTexts';
 import { ScrollView } from 'react-native-gesture-handler';
 
-interface Props {
+interface OwnProps {
   navigation: Navigation;
 }
 
-interface State {
-  levels: Level[];
-}
+type Props = ReduxProps & OwnProps;
 
-enum Difficulty {
-  Easy = 'easy',
-  Medium = 'medium',
-  Hard = 'hard',
+interface State {
+  stars: number;
+  levels: Level[];
 }
 
 interface Level {
   levelNumber: number;
-  difficulty: Difficulty;
+  name: string;
+  levelStars: number;
 }
 
-export default class StartGameMenu extends React.Component<Props, State> {
+class StartGameMenu extends React.Component<Props, State> {
   state: State = {
+    stars: this.props.stars,
     levels: [],
   };
 
-  componentDidMount() {
-    this.fillLevels();
-  }
-
-  fillLevels() {
-    let newLevels = [];
-    for (let i = 1; i < 10; i++) {
-      newLevels.push({
-        levelNumber: i,
-        difficulty: Difficulty.Easy,
-      });
-    }
-    this.setState({
-      levels: newLevels,
-    });
-  }
-
   renderLevelButtons() {
-    return this.state.levels.map(level => {
+    return this.state.levels.map(({ levelNumber, name, levelStars }, index) => {
       return (
-        <Fragment>
+        <Fragment key={index}>
           <MenuButton
-            text={`Level ${level.levelNumber}, difficulty: ${level.difficulty}`}
-            onPress={() => this.props.navigation.navigate('Level')}
+            text={`${levelNumber}:    ${name}     stars: ${levelStars}`}
+            onPress={() =>
+              this.props.navigation.navigate('Level', {
+                levelStars,
+                levelNumber,
+              })
+            }
           />
         </Fragment>
       );
     });
+  }
+
+  componentDidMount() {
+    const levels: Level[] = [];
+    // add levelStars to Reducer after adding level, there will be dispatch method to make it work somehow
+    for (let i = 1; i < this.props.levelStars.length; i++) {
+      levels.push({
+        levelNumber: i,
+        name: `Get name from file`,
+        levelStars: this.props.levelStars[i],
+      });
+    }
+    this.setState({ levels });
   }
 
   render() {
@@ -68,7 +71,9 @@ export default class StartGameMenu extends React.Component<Props, State> {
       >
         <ScrollView>
           <View style={styles.container}>
-            <Text style={TutorialTexts.text}>Choose level</Text>
+            <Text style={TutorialTexts.text}>
+              Your have {this.props.stars} stars!
+            </Text>
             {this.renderLevelButtons()}
           </View>
         </ScrollView>
@@ -76,3 +81,17 @@ export default class StartGameMenu extends React.Component<Props, State> {
     );
   }
 }
+
+type ReduxProps = ReturnType<typeof mapStateToProps>;
+
+const mapStateToProps = (state: RootReducerState) => {
+  return {
+    stars: state.stars.starsCount,
+    levelStars: state.levelStars.levelStarsCount,
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  null,
+)(StartGameMenu);

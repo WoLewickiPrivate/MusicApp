@@ -1,35 +1,47 @@
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 
-import Level from './src/components/Screens/Game/Level';
-import StartGameMenu from './src/components/Screens/Game/StartGameMenu';
-import MenuScreen from './src/components/Screens/MainMenu/MenuScreen';
-import Training from './src/components/Screens/Training/Training';
-import Tutorial from './src/components/Screens/Tutorial/Tutorial';
-import TutorialMenu from './src/components/Screens/Tutorial/TutorialMenu';
+import createSecureStore from 'redux-persist-expo-securestore';
 
-const MainNavigator = createStackNavigator(
-  {
-    Menu: { screen: MenuScreen },
-    Training: { screen: Training },
-    TutorialMenu: { screen: TutorialMenu },
-    Tutorial: { screen: Tutorial },
-    StartGameMenu: { screen: StartGameMenu },
-    Level: { screen: Level },
-  },
-  {
-    defaultNavigationOptions: {
-      headerStyle: {
-        backgroundColor: 'grey',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-      },
-    },
-  },
-);
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import { persistStore, persistReducer } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
+import Navigator from './src/navigation/AppNavigator';
+import { reducers } from './src/redux/RootReducer';
 
-const App = createAppContainer(MainNavigator);
+const storage = createSecureStore();
 
-export default App;
+const config = {
+  key: 'root',
+  storage,
+};
+
+const reducer = persistReducer(config, reducers);
+
+const store = createStore(reducer);
+
+const persistor = persistStore(store);
+
+export default class App extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <PersistGate
+          loading={
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <ActivityIndicator
+                style={{ alignSelf: 'center' }}
+                size="large"
+                color="#0000ff"
+              />
+            </View>
+          }
+          persistor={persistor}
+        >
+          <Navigator />
+        </PersistGate>
+      </Provider>
+    );
+  }
+}

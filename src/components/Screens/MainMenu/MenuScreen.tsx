@@ -9,11 +9,15 @@ interface Props {
 }
 
 export default class MenuScreen extends React.Component<Props> {
+  backgroundImage: any;
+  componentWillMount() {
+    this.backgroundImage = require('../../../static/backgroundImages/pianoMain.jpg');
+  }
   render() {
     const { navigate } = this.props.navigation;
     return (
       <ImageBackground
-        source={require('../../../static/backgroundImages/pianoMain.jpg')}
+        source={this.backgroundImage}
         style={{ width: '100%', height: '100%' }}
       >
         <View style={styles.container}>
@@ -22,12 +26,12 @@ export default class MenuScreen extends React.Component<Props> {
             onPress={() => navigate('StartGameMenu')}
           />
           <MenuButton
-            text="Start tutorial"
-            onPress={() => navigate('TutorialMenu')}
-          />
-          <MenuButton
             text="Do some training"
             onPress={() => navigate('Training')}
+          />
+          <MenuButton
+            text="Start tutorial"
+            onPress={() => navigate('TutorialMenu')}
           />
         </View>
       </ImageBackground>
