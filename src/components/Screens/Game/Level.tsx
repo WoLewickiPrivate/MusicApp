@@ -4,7 +4,6 @@ import range from 'just-range';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { addStars } from '../../../redux/StarsActions';
 import Piano from '../../Piano/Piano';
 import Board from './Board';
 import { tryAddStarsToLevel } from '../../../redux/LevelStarsActions';
@@ -54,12 +53,12 @@ class Level extends React.Component<Props, State> {
       midis.forEach(val => this.onStop(val['pitch']));
       const starsGained: number = this.countGainedStars();
       if (this.state.levelStars < starsGained) {
-        this.props.addGainedStars(starsGained - this.state.levelStars);
         this.props.addStarsToLevel({
           levelNumber: this.state.levelNumber,
           starsGained,
         });
       }
+      this.showEndGameDialog();
     });
   }
 
@@ -67,6 +66,11 @@ class Level extends React.Component<Props, State> {
     const starsGained = Math.floor(Math.random() * 58) % 4;
     console.warn(`Gained: ${starsGained} stars.`);
     return starsGained;
+  }
+
+  showEndGameDialog() {
+    // TODO
+    this.props.navigation.goBack();
   }
 
   componentDidMount() {
@@ -146,7 +150,6 @@ type ReduxProps = ReturnType<typeof mapDispatchToProps>;
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    addGainedStars: (stars: number) => dispatch(addStars(stars)),
     addStarsToLevel: (levelSpec: {
       levelNumber: number;
       starsGained: number;
