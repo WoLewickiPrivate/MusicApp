@@ -46,8 +46,8 @@ class Level extends React.Component<Props, State> {
 
   moveNotes() {
     Animated.timing(this.state.movingVal, {
-      toValue: 700,
-      duration: 10000,
+      toValue: this.calculateSongLength(),
+      duration: 1000,
     }).start(() => {
       clearInterval(this.state.intervalID);
       midis.forEach(val => this.onStop(val['pitch']));
@@ -124,6 +124,10 @@ class Level extends React.Component<Props, State> {
     });
 
     return midisMap;
+  };
+
+  calculateSongLength = () => {
+    return midis ? midis[midis.length - 1]['end'] * 5 : -1;
   };
 }
 
