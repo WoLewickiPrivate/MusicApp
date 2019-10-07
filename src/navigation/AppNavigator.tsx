@@ -27,6 +27,7 @@ const navOptions = {
 };
 
 const config = {
+  headerLayoutPreset: 'center',
   defaultNavigationOptions: navOptions,
 };
 
@@ -39,6 +40,7 @@ const MainNavigator = createStackNavigator(
     StartGameMenu: { screen: StartGameMenu },
     Level: { screen: Level },
   },
+  // @ts-ignore
   config,
 );
 
