@@ -1,12 +1,13 @@
 import React, { RefObject } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
-import range from 'just-range';
+
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import Piano from '../../Piano/Piano';
 import Board from './Board';
 import { tryAddStarsToLevel } from '../../../redux/LevelStarsActions';
+import range from '../../../utils/rangeUtils';
 
 interface OwnProps {
   navigation: Navigation;
@@ -40,14 +41,15 @@ class Level extends React.Component<Props, State> {
   pianoElement: RefObject<Piano> = React.createRef();
 
   onPlay = (note: number) =>
-    this.pianoElement.current.simulateOnTouchStart(note);
+    this.pianoElement.current!.simulateOnTouchStart(note);
 
-  onStop = (note: number) => this.pianoElement.current.simulateOnTouchEnd(note);
+  onStop = (note: number) =>
+    this.pianoElement.current!.simulateOnTouchEnd(note);
 
   moveNotes() {
     Animated.timing(this.state.movingVal, {
       toValue: this.calculateSongLength(),
-      duration: 1000,
+      duration: 5000,
     }).start(() => {
       clearInterval(this.state.intervalID);
       midis.forEach(val => this.onStop(val['pitch']));
@@ -79,6 +81,7 @@ class Level extends React.Component<Props, State> {
 
     this.intervalID = setInterval(() => {
       let midiIndex = Math.trunc(
+        // @ts-ignore
         this.state.movingVal._value / this.brickUnitLength,
       );
 
@@ -89,7 +92,7 @@ class Level extends React.Component<Props, State> {
       }
     }, 10);
 
-    this.moveNotes();
+    setTimeout(() => this.moveNotes(), 1000);
   }
 
   render() {
@@ -113,13 +116,15 @@ class Level extends React.Component<Props, State> {
   }
 
   initializeMidiMap = () => {
-    let startTime = midis[0]['start'];
-    let endTime = midis[midis.length - 1]['end'] + 1;
+    let startTime = midis[0].start;
+    let endTime = midis[midis.length - 1].end + 1;
 
-    let midisMap = range(startTime, endTime).map(() => []);
+    const midisMap: Array<Array<number>> = range(startTime, endTime).map(
+      () => [],
+    );
     midis.forEach(element => {
-      for (let i = element['start']; i < element['end']; i++) {
-        midisMap[i].push(element['pitch']);
+      for (let i = element.start; i < element.end; i++) {
+        midisMap[i].push(element.pitch);
       }
     });
 
@@ -127,7 +132,7 @@ class Level extends React.Component<Props, State> {
   };
 
   calculateSongLength = () => {
-    return midis ? midis[midis.length - 1]['end'] * 5 : -1;
+    return midis ? midis[midis.length - 1]['end'] * this.brickUnitLength : -1;
   };
 }
 
