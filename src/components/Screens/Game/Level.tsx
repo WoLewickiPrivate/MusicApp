@@ -1,21 +1,31 @@
 import React, { RefObject } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
+import range from 'just-range';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import Piano from '../../Piano/Piano';
 import Board from './Board';
-import range from 'just-range';
+import { tryAddStarsToLevel } from '../../../redux/LevelStarsActions';
 
-interface Props {
+interface OwnProps {
   navigation: Navigation;
 }
+
+type Props = ReduxProps & OwnProps;
+
 interface State {
+  levelNumber: number;
+  levelStars: number;
   noteIndex: number;
   movingVal: Animated.Value;
   intervalID: any;
 }
 
-export default class Level extends React.Component<Props, State> {
+class Level extends React.Component<Props, State> {
   state: State = {
+    levelNumber: this.props.navigation.getParam('levelNumber'),
+    levelStars: this.props.navigation.getParam('levelStars'),
     noteIndex: 0,
     movingVal: new Animated.Value(0),
     intervalID: 0,
@@ -41,7 +51,26 @@ export default class Level extends React.Component<Props, State> {
     }).start(() => {
       clearInterval(this.state.intervalID);
       midis.forEach(val => this.onStop(val['pitch']));
+      const starsGained: number = this.countGainedStars();
+      if (this.state.levelStars < starsGained) {
+        this.props.addStarsToLevel({
+          levelNumber: this.state.levelNumber,
+          starsGained,
+        });
+      }
+      this.showEndGameDialog();
     });
+  }
+
+  countGainedStars(): number {
+    const starsGained = Math.floor(Math.random() * 58) % 4;
+    console.warn(`Gained: ${starsGained} stars.`);
+    return starsGained;
+  }
+
+  showEndGameDialog() {
+    // TODO
+    this.props.navigation.goBack();
   }
 
   componentDidMount() {
@@ -116,3 +145,19 @@ const midis = [
   { pitch: 81, start: 80, end: 120 },
   { pitch: 63, start: 80, end: 140 },
 ];
+
+type ReduxProps = ReturnType<typeof mapDispatchToProps>;
+
+function mapDispatchToProps(dispatch: Dispatch) {
+  return {
+    addStarsToLevel: (levelSpec: {
+      levelNumber: number;
+      starsGained: number;
+    }) => dispatch(tryAddStarsToLevel(levelSpec)),
+  };
+}
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(Level);

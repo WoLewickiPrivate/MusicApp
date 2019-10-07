@@ -8,7 +8,9 @@ export default async function(request: string) {
       },
       body: request,
     });
+    return response;
   } catch (error) {
     console.error(error);
+    return '404 dupa';
   }
 }
