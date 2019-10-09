@@ -1,5 +1,8 @@
 import React, { RefObject } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
+import range from 'just-range';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
