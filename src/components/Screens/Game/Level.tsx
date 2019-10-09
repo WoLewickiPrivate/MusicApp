@@ -68,7 +68,6 @@ class Level extends React.Component<Props, State> {
 
   countGainedStars(): number {
     const starsGained = Math.floor(Math.random() * 58) % 4;
-    console.warn(`Gained: ${starsGained} stars.`);
     return starsGained;
   }
 
@@ -84,7 +83,7 @@ class Level extends React.Component<Props, State> {
     let intervalID = setInterval(() => {
       let midiIndex = Math.trunc(this.state.movingVal._value);
 
-      if (!arrayEquals(previous, midisMap[midiIndex])) {
+      if (!arraysEqual(previous, midisMap[midiIndex])) {
         previous.forEach(note => this.onStop(note));
         previous = midisMap[midiIndex];
         midisMap[midiIndex].forEach((note: number) => this.onPlay(note));
@@ -119,7 +118,6 @@ class Level extends React.Component<Props, State> {
   }
 
   initializeMidiMap = () => {
-    //console.warn(this.state.notes.midisArray);
     const midis = this.state.notes.midisArray.map(element => {
       return {
         start: Math.trunc(element.start * this.brickUnitLength),
@@ -127,7 +125,6 @@ class Level extends React.Component<Props, State> {
         pitch: element.pitch,
       };
     });
-    //console.warn(midis);
     const startTime = midis[0].start;
     const endTime = midis[midis.length - 1].end;
 
@@ -135,14 +132,11 @@ class Level extends React.Component<Props, State> {
       () => [],
     );
 
-    //console.warn(midisMap.length);
     midis.forEach(element => {
       for (let i = element.start; i < element.end; i++) {
         midisMap[i].push(element.pitch);
       }
     });
-
-    console.warn(midisMap);
 
     return midisMap;
   };
@@ -162,8 +156,15 @@ const styles = StyleSheet.create({
 
 type ReduxProps = ReturnType<typeof mapDispatchToProps>;
 
-function arrayEquals(arr1: any[], arr2: any[]) {
-  return arr1.toString() == arr2.toString();
+function arraysEqual(a: any[], b: any[]) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length != b.length) return false;
+
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
@@ -174,11 +175,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
     }) => dispatch(tryAddStarsToLevel(levelSpec)),
   };
 }
-
-const midiss = [
-  { pitch: 60, start: 0, end: 10 },
-  { pitch: 60, start: 10, end: 20 },
-];
 
 export default connect(
   null,

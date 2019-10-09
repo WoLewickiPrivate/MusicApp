@@ -28,7 +28,6 @@ interface Level {
 }
 
 const song = require('../../../static/sounds/output.json');
-console.warn(convertMidi(song));
 
 class StartGameMenu extends React.Component<Props, State> {
   static getDerivedStateFromProps(props: Props, state: State) {
