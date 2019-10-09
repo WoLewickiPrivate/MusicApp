@@ -8,6 +8,7 @@ import styles from '../../../styles/Menu/MenuMainStyle';
 import MenuButton from '../../Buttons/MenuButton';
 import TutorialTexts from '../../../styles/Texts/TutorialTexts';
 import { ScrollView } from 'react-native-gesture-handler';
+import convertMidi from '../../../utils/midiConverter';
 
 interface OwnProps {
   navigation: Navigation;
@@ -25,6 +26,9 @@ interface Level {
   name: string;
   levelStars: number;
 }
+
+const song = require('../../../static/sounds/output.json');
+console.warn(convertMidi(song));
 
 class StartGameMenu extends React.Component<Props, State> {
   static getDerivedStateFromProps(props: Props, state: State) {
@@ -72,6 +76,7 @@ class StartGameMenu extends React.Component<Props, State> {
               this.props.navigation.navigate('Level', {
                 levelStars,
                 levelNumber,
+                noteSequence: convertMidi(song),
               })
             }
           />

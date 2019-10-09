@@ -11,6 +11,5 @@ export default async function(request: string) {
     return response;
   } catch (error) {
     console.error(error);
-    return '404 dupa';
   }
 }

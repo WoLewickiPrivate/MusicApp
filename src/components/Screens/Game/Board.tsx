@@ -74,6 +74,12 @@ export default class Board extends Component<Props, State> {
     return this.state.midis.map((element: MidiElement, index) => {
       const pitch = element.pitch;
       const { isAccidental } = MidiNumbers.getAttributes(pitch);
+      console.warn(
+        'top' +
+          Math.trunc(element.start * this.unitLength) +
+          ' height ' +
+          Math.trunc((element.end - element.start) * this.unitLength),
+      );
       return (
         <Brick
           key={index}
@@ -81,8 +87,8 @@ export default class Board extends Component<Props, State> {
           midiNumber={pitch}
           noteRange={this.state.noteRange}
           accidental={isAccidental}
-          top={element.start * this.unitLength}
-          height={(element.end - element.start) * this.unitLength}
+          top={Math.trunc(element.start * this.unitLength)}
+          height={Math.trunc((element.end - element.start) * this.unitLength)}
         />
       );
     });

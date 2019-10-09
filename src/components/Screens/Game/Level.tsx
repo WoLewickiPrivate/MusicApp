@@ -15,29 +15,33 @@ interface OwnProps {
 
 type Props = ReduxProps & OwnProps;
 
+interface Sequence {
+  totalDuration: number;
+  midisArray: MidiElement[];
+}
 interface State {
   levelNumber: number;
   levelStars: number;
   noteIndex: number;
   movingVal: Animated.Value;
   intervalID: any;
+  notes: Sequence;
 }
 
 class Level extends React.Component<Props, State> {
   state: State = {
     levelNumber: this.props.navigation.getParam('levelNumber'),
     levelStars: this.props.navigation.getParam('levelStars'),
+    notes: this.props.navigation.getParam('noteSequence', {}),
     noteIndex: 0,
     movingVal: new Animated.Value(0),
     intervalID: 0,
   };
 
-  brickUnitLength = 5;
+  brickUnitLength = 50;
   intervalID = 0;
   firstNote = 'c4';
   lastNote = 'c#6';
-  notesLength: number = this.props.navigation.getParam('notesLength', 0);
-  notes: any = this.props.navigation.getParam('notes', []);
   pianoElement: RefObject<Piano> = React.createRef();
 
   onPlay = (note: number) =>
@@ -49,10 +53,10 @@ class Level extends React.Component<Props, State> {
   moveNotes() {
     Animated.timing(this.state.movingVal, {
       toValue: this.calculateSongLength(),
-      duration: 5000,
+      duration: this.state.notes.totalDuration * 1000,
     }).start(() => {
       clearInterval(this.state.intervalID);
-      midis.forEach(val => this.onStop(val['pitch']));
+      this.state.notes.midisArray.forEach(val => this.onStop(val.pitch));
       const starsGained: number = this.countGainedStars();
       if (this.state.levelStars < starsGained) {
         this.props.addStarsToLevel({
@@ -84,7 +88,7 @@ class Level extends React.Component<Props, State> {
         // @ts-ignore
         this.state.movingVal._value / this.brickUnitLength,
       );
-
+      console.warn(previous + ' ' + midisMap[midiIndex]);
       if (previous.toString() !== midisMap[midiIndex].toString()) {
         previous.forEach(note => this.onStop(note));
         previous = midisMap[midiIndex];
@@ -103,7 +107,7 @@ class Level extends React.Component<Props, State> {
           noteRange={{ first: this.firstNote, last: this.lastNote }}
           startPos={0}
           movingVal={this.state.movingVal}
-          midis={midis}
+          midis={this.state.notes.midisArray}
         />
         <Piano
           ref={this.pianoElement}
@@ -116,23 +120,37 @@ class Level extends React.Component<Props, State> {
   }
 
   initializeMidiMap = () => {
-    let startTime = midis[0].start;
-    let endTime = midis[midis.length - 1].end + 1;
+    //console.warn(this.state.notes.midisArray);
+    const midis = this.state.notes.midisArray.map(element => {
+      return {
+        start: Math.trunc(element.start * this.brickUnitLength),
+        end: Math.trunc(element.end * this.brickUnitLength),
+        pitch: element.pitch,
+      };
+    });
+    console.warn(midis);
+    const startTime = midis[0].start;
+    const endTime = midis[midis.length - 1].end;
 
-    const midisMap: Array<Array<number>> = range(startTime, endTime).map(
+    const midisMap: Array<Array<number>> = range(startTime, endTime + 1).map(
       () => [],
     );
+
+    console.warn(midisMap.length);
     midis.forEach(element => {
       for (let i = element.start; i < element.end; i++) {
         midisMap[i].push(element.pitch);
       }
     });
 
+    console.warn(midisMap);
+
     return midisMap;
   };
 
-  calculateSongLength = () => {
-    return midis ? midis[midis.length - 1]['end'] * this.brickUnitLength : -1;
+  calculateSongLength = (): number => {
+    const midis: MidiElement[] = this.state.notes.midisArray;
+    return midis ? midis[midis.length - 1].end * this.brickUnitLength : -1;
   };
 }
 
@@ -144,17 +162,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const midis = [
-  { pitch: 60, start: 0, end: 10 },
-  { pitch: 61, start: 10, end: 20 },
-  { pitch: 65, start: 10, end: 30 },
-  { pitch: 67, start: 30, end: 40 },
-  { pitch: 79, start: 40, end: 60 },
-  { pitch: 77, start: 60, end: 80 },
-  { pitch: 81, start: 80, end: 120 },
-  { pitch: 63, start: 80, end: 140 },
-];
-
 type ReduxProps = ReturnType<typeof mapDispatchToProps>;
 
 function mapDispatchToProps(dispatch: Dispatch) {
@@ -165,6 +172,11 @@ function mapDispatchToProps(dispatch: Dispatch) {
     }) => dispatch(tryAddStarsToLevel(levelSpec)),
   };
 }
+
+const midiss = [
+  { pitch: 60, start: 0, end: 10 },
+  { pitch: 60, start: 10, end: 20 },
+];
 
 export default connect(
   null,
