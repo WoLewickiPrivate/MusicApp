@@ -1,26 +1,19 @@
 import { element } from 'prop-types';
 
 export default function convertSequenceNote(sequence: SequenceNote) {
-  const totalDuration = sequence.totalTime;
+  const totalDuration = sequence.totalTime ? sequence.totalTime : 0;
   const notesArray = sequence.notes;
+  const defaultPitch = 60;
 
   const midisArray: Array<MidiElement> = [];
 
   if (notesArray) {
     notesArray.forEach(element => {
-      // if (element.startTime && element.endTime && element.pitch) {
       midisArray.push({
         start: element.startTime ? element.startTime : 0,
-        end: element.endTime ? element.endTime : 0,
-        pitch: element.pitch ? element.pitch : 0,
+        end: element.endTime ? element.endTime : totalDuration,
+        pitch: element.pitch ? element.pitch : defaultPitch,
       });
-      // } else if (!element.startTime && element.endTime && element.pitch) {
-      // midisArray.push({
-      //   start: 0,
-      //   end: element.endTime ? element.endTime : 0,
-      //   pitch: element.pitch ? element.pitch : 0,
-      // });
-      // }
     });
   }
 
