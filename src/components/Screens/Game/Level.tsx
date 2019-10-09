@@ -1,9 +1,5 @@
 import React, { RefObject } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
-import range from 'just-range';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
@@ -91,7 +87,6 @@ class Level extends React.Component<Props, State> {
         // @ts-ignore
         this.state.movingVal._value / this.brickUnitLength,
       );
-      console.warn(previous + ' ' + midisMap[midiIndex]);
       if (previous.toString() !== midisMap[midiIndex].toString()) {
         previous.forEach(note => this.onStop(note));
         previous = midisMap[midiIndex];
