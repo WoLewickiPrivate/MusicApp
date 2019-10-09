@@ -1,4 +1,4 @@
-import range from 'just-range';
+import range from '../../utils/rangeUtils';
 
 const SORTED_PITCHES: string[] = [
   'C',
@@ -47,7 +47,7 @@ const NOTES_IN_OCTAVE = 12;
 // References:
 // - http://www.flutopedia.com/octave_notation.htm
 // - https://github.com/danigb/tonal/blob/master/packages/note/index.js
-function fromNote(note: String) {
+function fromNote(note: String): number {
   if (!note) {
     throw Error('Invalid note argument');
   }

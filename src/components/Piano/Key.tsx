@@ -94,6 +94,9 @@ class Key extends React.Component<Props> {
     } = this.props;
 
     const { touched } = this.state;
+    let isAccidentalActive = accidental
+      ? styles.ReactPiano__Key__active_accidental
+      : styles.ReactPiano__Key__active;
     return (
       <View
         style={[
@@ -111,7 +114,7 @@ class Key extends React.Component<Props> {
                 : naturalKeyWidth,
             ),
           },
-          touched && styles.ReactPiano__Key__active,
+          touched && isAccidentalActive,
         ]}
       >
         <View style={styles.ReactPiano__NoteLabelContainer}>{children}</View>
@@ -147,6 +150,9 @@ const styles = StyleSheet.create({
   },
   ReactPiano__Key__active: {
     backgroundColor: '#3ac8da',
+  },
+  ReactPiano__Key__active_accidental: {
+    backgroundColor: '#3a9fda',
   },
   ReactPiano__NoteLabelContainer: {
     flex: 1,

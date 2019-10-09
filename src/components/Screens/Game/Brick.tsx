@@ -89,7 +89,7 @@ function ratioToPercentage(ratio: number) {
 const styles = StyleSheet.create({
   ReactPiano__Key: {
     position: 'absolute',
-    borderWidth: 1,
+    borderWidth: 0,
     borderRadius: 5,
   },
   ReactPiano__Key__natural: {

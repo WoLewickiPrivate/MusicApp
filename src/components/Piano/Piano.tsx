@@ -1,14 +1,9 @@
 import React, { Component, RefObject } from 'react';
-import PropTypes from 'prop-types';
-
 import { StyleSheet, View } from 'react-native';
 
-import range from 'just-range';
-
 import Key from './Key';
-
 import MidiNumbers from './MidiNumbers';
-
+import range from '../../utils/rangeUtils';
 interface Props {
   noteRange: any;
   onPlayNoteInput: Function;
@@ -16,22 +11,20 @@ interface Props {
 }
 
 interface State {
-  noteRange: any;
+  noteRange: {
+    first: number;
+    last: number;
+  };
   keyReferences: RefObject<Key>[];
 }
 
 class Piano extends Component<Props, State> {
-  state = {
+  state: State = {
     noteRange: {
       first: MidiNumbers.fromNote('c4'),
       last: MidiNumbers.fromNote('e5'),
     },
     keyReferences: new Array(),
-  };
-
-  static propTypes = {
-    onPlayNoteInput: PropTypes.func.isRequired,
-    onStopNoteInput: PropTypes.func.isRequired,
   };
 
   componentDidMount() {
@@ -45,7 +38,7 @@ class Piano extends Component<Props, State> {
       keyReferences: range(
         MidiNumbers.fromNote(noteRange.first),
         MidiNumbers.fromNote(noteRange.last) + 1,
-      ).map(React.createRef),
+      ).map(() => React.createRef<Key>()),
     });
   }
 
@@ -83,7 +76,7 @@ class Piano extends Component<Props, State> {
       return;
 
     let index = note - this.state.noteRange.first;
-    this.state.keyReferences[index].current.simulateOnTouchStart();
+    this.state.keyReferences[index].current!.simulateOnTouchStart();
   }
 
   simulateOnTouchEnd(note: number) {
@@ -91,7 +84,7 @@ class Piano extends Component<Props, State> {
       return;
 
     let index = note - this.state.noteRange.first;
-    this.state.keyReferences[index].current.simulateOnTouchEnd();
+    this.state.keyReferences[index].current!.simulateOnTouchEnd();
   }
 
   render() {
@@ -102,6 +95,7 @@ class Piano extends Component<Props, State> {
           const { isAccidental } = MidiNumbers.getAttributes(midiNumber);
           return (
             <Key
+              key={midiNumber}
               ref={
                 this.state.keyReferences[
                   midiNumber - this.state.noteRange.first

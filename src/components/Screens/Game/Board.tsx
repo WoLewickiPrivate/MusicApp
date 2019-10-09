@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-
 import { StyleSheet, Animated } from 'react-native';
-
-import range from 'just-range';
+import { AnimatedValue } from 'react-navigation';
 
 import MidiNumbers from '../../Piano/MidiNumbers';
 import Brick from './Brick';
-import { AnimatedValue } from 'react-navigation';
+import range from '../../../utils/rangeUtils';
 
 interface Props {
   noteRange: any;
@@ -73,17 +71,18 @@ export default class Board extends Component<Props, State> {
   }
 
   generateNotes(naturalKeyWidth: number) {
-    return this.state.midis.map(element => {
-      const pitch = element['pitch'];
+    return this.state.midis.map((element: MidiElement, index) => {
+      const pitch = element.pitch;
       const { isAccidental } = MidiNumbers.getAttributes(pitch);
       return (
         <Brick
+          key={index}
           naturalKeyWidth={naturalKeyWidth}
           midiNumber={pitch}
           noteRange={this.state.noteRange}
           accidental={isAccidental}
-          top={element['start'] * this.unitLength}
-          height={(element['end'] - element['start']) * this.unitLength}
+          top={Math.trunc(element.start * this.unitLength)}
+          height={Math.trunc((element.end - element.start) * this.unitLength)}
         />
       );
     });
