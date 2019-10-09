@@ -15,8 +15,16 @@ export default class Training extends React.Component<Props> {
         style={{ width: '100%', height: '100%', position: 'relative' }}
       >
         <MenuButton
-          text={'Play random generated composition'}
-          onPress={() => this.props.navigation.navigate('TrainingLevel')}
+          text={`Practice based on your progress`}
+          onPress={() =>
+            this.props.navigation.navigate('Level', {
+              isTraining: true,
+              noteSequence: {
+                notes: [{ start: 0, end: 1, pitch: 60 }],
+                totalDuration: 1.5,
+              },
+            })
+          }
         />
       </ImageBackground>
     );
