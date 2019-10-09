@@ -38,7 +38,6 @@ class Level extends React.Component<Props, State> {
   };
 
   brickUnitLength = 50;
-  intervalID = 0;
   firstNote = 'c4';
   lastNote = 'c#6';
   pianoElement: RefObject<Piano> = React.createRef();
@@ -82,17 +81,19 @@ class Level extends React.Component<Props, State> {
     let midisMap = this.initializeMidiMap();
     let previous: Array<number> = [];
 
-    this.intervalID = setInterval(() => {
-      let midiIndex = Math.trunc(
-        // @ts-ignore
-        this.state.movingVal._value / this.brickUnitLength,
-      );
-      if (previous.toString() !== midisMap[midiIndex].toString()) {
+    let intervalID = setInterval(() => {
+      let midiIndex = Math.trunc(this.state.movingVal._value);
+
+      if (!arrayEquals(previous, midisMap[midiIndex])) {
         previous.forEach(note => this.onStop(note));
         previous = midisMap[midiIndex];
         midisMap[midiIndex].forEach((note: number) => this.onPlay(note));
       }
     }, 10);
+
+    this.setState({
+      intervalID: intervalID,
+    });
 
     setTimeout(() => this.moveNotes(), 1000);
   }
@@ -126,7 +127,7 @@ class Level extends React.Component<Props, State> {
         pitch: element.pitch,
       };
     });
-    console.warn(midis);
+    //console.warn(midis);
     const startTime = midis[0].start;
     const endTime = midis[midis.length - 1].end;
 
@@ -134,7 +135,7 @@ class Level extends React.Component<Props, State> {
       () => [],
     );
 
-    console.warn(midisMap.length);
+    //console.warn(midisMap.length);
     midis.forEach(element => {
       for (let i = element.start; i < element.end; i++) {
         midisMap[i].push(element.pitch);
@@ -147,8 +148,7 @@ class Level extends React.Component<Props, State> {
   };
 
   calculateSongLength = (): number => {
-    const midis: MidiElement[] = this.state.notes.midisArray;
-    return midis ? midis[midis.length - 1].end * this.brickUnitLength : -1;
+    return this.state.notes.totalDuration * this.brickUnitLength;
   };
 }
 
@@ -161,6 +161,10 @@ const styles = StyleSheet.create({
 });
 
 type ReduxProps = ReturnType<typeof mapDispatchToProps>;
+
+function arrayEquals(arr1: any[], arr2: any[]) {
+  return arr1.toString() == arr2.toString();
+}
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
