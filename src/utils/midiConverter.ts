@@ -1,8 +1,11 @@
-import { element } from 'prop-types';
+export interface Sequence {
+  totalDuration: number;
+  midisArray: MidiElement[];
+}
 
 export default function convertSequenceNote(sequence: SequenceNote) {
   const totalDuration = sequence.totalTime ? sequence.totalTime : 0;
-  const notesArray = sequence.notes;
+  const notesArray = sequence.notes ? sequence.notes : [];
   const defaultPitch = 60;
 
   const midisArray: Array<MidiElement> = [];

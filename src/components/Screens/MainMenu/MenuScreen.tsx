@@ -27,7 +27,7 @@ export default class MenuScreen extends React.Component<Props> {
           />
           <MenuButton
             text="Do some training"
-            onPress={() => navigate('Training')}
+            onPress={() => navigate('TrainingMenu')}
           />
           <MenuButton
             text="Start tutorial"
