@@ -9,6 +9,7 @@ import MenuButton from '../../Buttons/MenuButton';
 import TutorialTexts from '../../../styles/Texts/TutorialTexts';
 import { ScrollView } from 'react-native-gesture-handler';
 import convertMidi from '../../../utils/midiConverter';
+import LevelButton from '../../Buttons/LevelButton';
 
 interface OwnProps {
   navigation: Navigation;
@@ -69,8 +70,11 @@ class StartGameMenu extends React.Component<Props, State> {
     return this.state.levels.map(({ levelNumber, name, levelStars }, index) => {
       return (
         <Fragment key={index}>
-          <MenuButton
-            text={`${levelNumber}:    ${name}     stars: ${levelStars}`}
+          <LevelButton
+            disabled={this.state.stars < (levelNumber - 1) * 2}
+            stars={levelStars}
+            levelNumber={levelNumber}
+            name={name}
             onPress={() =>
               this.props.navigation.navigate('Level', {
                 levelStars,
