@@ -1,5 +1,5 @@
 import React from 'react';
-import { ImageBackground, ScrollView, View } from 'react-native';
+import { ImageBackground, View } from 'react-native';
 
 import MenuButton from '../../Buttons/MenuButton';
 import convertMidi from '../../../utils/midiConverter';

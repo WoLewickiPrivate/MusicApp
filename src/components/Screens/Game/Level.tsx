@@ -2,6 +2,7 @@ import React, { RefObject } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import { AnimatedValue } from 'react-navigation';
 
 import Piano from '../../Piano/Piano';
 import Board from './Board';
@@ -11,9 +12,11 @@ import {
   arraysEqual,
   onPlay,
   onStop,
-  moveNotes,
+  calculateSongLength,
+  countGainedStars,
 } from '../../../utils/notesParsing';
 import { Sequence } from '../../../utils/midiConverter';
+import EndGamePopup from './EndGamePopup';
 
 interface OwnProps {
   navigation: Navigation;
@@ -22,22 +25,20 @@ interface OwnProps {
 type Props = ReduxProps & OwnProps;
 
 interface State {
-  levelNumber: number;
   levelStars: number;
   noteIndex: number;
   movingVal: Animated.Value;
   notes: Sequence;
-  isTraining: boolean;
+  didGameEnd: boolean;
 }
 
 class Level extends React.Component<Props, State> {
   state: State = {
-    levelNumber: this.props.navigation.getParam('levelNumber'),
     levelStars: this.props.navigation.getParam('levelStars'),
     notes: this.props.navigation.getParam('noteSequence', {}),
     noteIndex: 0,
     movingVal: new Animated.Value(0),
-    isTraining: this.props.navigation.getParam('isTraining', false),
+    didGameEnd: false,
   };
 
   brickUnitLength: number = 50;
@@ -45,6 +46,32 @@ class Level extends React.Component<Props, State> {
   lastNote: string = 'c#6';
   pianoElement: RefObject<Piano> = React.createRef();
   intervalID: any = null;
+  starsGained: number = 0;
+
+  moveNotes() {
+    Animated.timing(this.state.movingVal, {
+      toValue: calculateSongLength(
+        this.state.notes.totalDuration,
+        this.brickUnitLength,
+      ),
+      duration: this.state.notes.totalDuration * 1000,
+    }).start(() => {
+      clearInterval(this.intervalID);
+      this.state.notes.midisArray.forEach(val =>
+        onStop(val.pitch, this.pianoElement),
+      );
+      if (!this.props.navigation.getParam('isTraining', false)) {
+        this.starsGained = countGainedStars();
+        if (this.state.levelStars < this.starsGained) {
+          this.props.addStarsToLevel({
+            levelNumber: this.props.navigation.getParam('levelNumber', 0),
+            starsGained: this.starsGained,
+          });
+        }
+      }
+      this.setState({ didGameEnd: true });
+    });
+  }
 
   componentDidMount() {
     const midisMap = initializeMidiMap(this.state.notes, this.brickUnitLength);
@@ -63,27 +90,25 @@ class Level extends React.Component<Props, State> {
       }
     }, 10);
 
-    setTimeout(
-      () =>
-        moveNotes(
-          this.state.notes,
-          this.brickUnitLength,
-          this.intervalID,
-          this.state.movingVal,
-          this.state.isTraining,
-          this.state.levelStars,
-          this.state.levelNumber,
-          this.props.addStarsToLevel,
-          this.props.navigation,
-          this.pianoElement,
-        ),
-      1000,
-    );
+    setTimeout(() => this.moveNotes(), 1000);
   }
 
   render() {
     return (
       <View style={styles.container}>
+        {this.state.didGameEnd && (
+          <EndGamePopup
+            navigation={this.props.navigation}
+            levelNumber={this.props.navigation.getParam('levelNumber', 0)}
+            levelStars={this.starsGained}
+            visible={this.state.didGameEnd}
+            isTraining={this.props.navigation.getParam('isTraining', false)}
+            song={this.props.navigation.getParam('noteSequence', {})}
+            startAgain={() => {
+              this.moveNotes();
+            }}
+          />
+        )}
         <Board
           unitLength={this.brickUnitLength}
           noteRange={{ first: this.firstNote, last: this.lastNote }}

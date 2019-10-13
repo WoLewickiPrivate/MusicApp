@@ -1,12 +1,9 @@
 import { RefObject } from 'react';
 import { Animated } from 'react-native';
 
-import { AnimatedValue } from 'react-navigation';
-
 import { Sequence } from '../utils/midiConverter';
 import range from '../utils/rangeUtils';
 import Piano from '../components/Piano/Piano';
-import { ReduxProps } from '../components/Screens/Game/Level';
 
 function initializeMidiMap(notes: Sequence, brickUnitLength: number) {
   const midis = notes.midisArray.map(element => {
@@ -58,49 +55,9 @@ function onStop(note: number, pianoElement: RefObject<Piano>) {
   pianoElement.current!.simulateOnTouchEnd(note);
 }
 
-function moveNotes(
-  notes: Sequence,
-  brickUnitLength: number,
-  intervalID: number,
-  movingVal: AnimatedValue,
-  isTraining: boolean,
-  levelStars: number,
-  levelNumber: number,
-  addStarsToLevel: ReduxProps['addStarsToLevel'],
-  navigation: Navigation,
-  pianoElement: RefObject<Piano>,
-) {
-  Animated.timing(movingVal, {
-    toValue: calculateSongLength(notes.totalDuration, brickUnitLength),
-    duration: notes.totalDuration * 1000,
-  }).start(() => {
-    clearInterval(intervalID);
-    notes.midisArray.forEach(val => onStop(val.pitch, pianoElement));
-    if (!isTraining) {
-      const starsGained: number = countGainedStars();
-      if (levelStars < starsGained) {
-        addStarsToLevel({
-          levelNumber,
-          starsGained,
-        });
-      }
-    }
-    showEndGameDialog(navigation, isTraining);
-  });
-}
-
 function countGainedStars(): number {
   const starsGained = Math.floor(Math.random() * 58) % 4;
   return starsGained;
-}
-
-function showEndGameDialog(navigation: Navigation, isTraining: boolean) {
-  // TODO
-  if (isTraining) {
-    navigation.goBack();
-  } else {
-    navigation.goBack();
-  }
 }
 
 export {
@@ -109,5 +66,5 @@ export {
   arraysEqual,
   onStop,
   onPlay,
-  moveNotes,
+  countGainedStars,
 };
