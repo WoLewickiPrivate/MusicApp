@@ -17,6 +17,7 @@ interface Props {
   song: Sequence;
   isTraining: boolean;
   startAgain: any;
+  goBack: any;
 }
 
 interface State {
@@ -25,9 +26,19 @@ interface State {
 
 export default class EndGamePopup extends Component<Props, State> {
   state: State = {
-    visible: true,
+    visible: this.props.visible,
   };
+  static getDerivedStateFromProps(props: Props, state: State) {
+    if (props.visible != state.visible) {
+      return {
+        visible: props.visible,
+      };
+    }
+    return null;
+  }
+
   render() {
+    console.log('Popup: ' + this.props.visible);
     return (
       <Modal
         width={0.9}
@@ -43,20 +54,18 @@ export default class EndGamePopup extends Component<Props, State> {
         <ModalContent style={{ paddingTop: 10 }}>
           {!this.props.isTraining && (
             <Text style={{ alignSelf: 'center' }}>
-              Stars gained: {this.props.levelStars}
+              {this.state.visible && this.props.levelStars}
             </Text>
           )}
           <Button
             title="Go back to menu"
             onPress={() => {
-              this.props.navigation.goBack();
-              this.setState({ visible: false });
+              this.props.goBack();
             }}
           />
           <Button
             title="Restart level"
             onPress={() => {
-              this.setState({ visible: false });
               this.props.startAgain();
             }}
           />
