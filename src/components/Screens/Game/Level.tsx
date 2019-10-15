@@ -125,6 +125,11 @@ class Level extends React.Component<Props, State> {
             this.setState({ didGameEnd: false });
             this.props.navigation.goBack();
           }}
+          doTraining={() => {
+            // TODO fetch new song
+            this.setState({ didGameEnd: false });
+            this.startGame();
+          }}
         />
 
         <Button

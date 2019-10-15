@@ -16,8 +16,9 @@ interface Props {
   levelNumber: number;
   song: Sequence;
   isTraining: boolean;
-  startAgain: any;
-  goBack: any;
+  startAgain: () => void;
+  goBack: () => void;
+  doTraining: () => void;
 }
 
 interface State {
@@ -73,11 +74,7 @@ export default class EndGamePopup extends Component<Props, State> {
             title="Train weak elements with different notes"
             onPress={() => {
               this.setState({ visible: false });
-              this.props.navigation.navigate('Level', {
-                levelStars: this.props.levelStars,
-                levelNumber: this.props.levelNumber,
-                noteSequence: this.props.song,
-              });
+              this.props.doTraining();
             }}
           />
         </ModalContent>
