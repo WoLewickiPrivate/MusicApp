@@ -39,7 +39,6 @@ export default class EndGamePopup extends Component<Props, State> {
   }
 
   render() {
-    console.log('Popup: ' + this.props.visible);
     return (
       <Modal
         width={0.9}
@@ -54,8 +53,8 @@ export default class EndGamePopup extends Component<Props, State> {
       >
         <ModalContent style={{ paddingTop: 10 }}>
           {!this.props.isTraining && (
-            <Text style={{ alignSelf: 'center' }}>
-              {this.state.visible && this.props.levelStars}
+            <Text style={{ alignSelf: 'center', fontSize: 20 }}>
+              You gained {this.props.levelStars} stars!
             </Text>
           )}
           <Button

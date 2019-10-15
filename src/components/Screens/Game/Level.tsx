@@ -2,7 +2,6 @@ import React, { RefObject } from 'react';
 import { StyleSheet, View, Animated, Button } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { AnimatedValue } from 'react-navigation';
 
 import Piano from '../../Piano/Piano';
 import Board from './Board';
@@ -30,6 +29,7 @@ interface State {
   movingVal: Animated.Value;
   notes: Sequence;
   didGameEnd: boolean;
+  didGameStart: boolean;
 }
 
 class Level extends React.Component<Props, State> {
@@ -39,6 +39,7 @@ class Level extends React.Component<Props, State> {
     noteIndex: 0,
     movingVal: new Animated.Value(0),
     didGameEnd: false,
+    didGameStart: false,
   };
 
   brickUnitLength: number = 50;
@@ -117,25 +118,29 @@ class Level extends React.Component<Props, State> {
           isTraining={this.props.navigation.getParam('isTraining', false)}
           song={this.props.navigation.getParam('noteSequence', {})}
           startAgain={() => {
-            this.setState({ didGameEnd: false });
-            console.log(this.state.didGameEnd);
+            this.setState({ didGameEnd: false, didGameStart: false });
             this.startGame();
           }}
           goBack={() => {
-            this.setState({ didGameEnd: false });
+            this.setState({ didGameEnd: false, didGameStart: false });
             this.props.navigation.goBack();
           }}
           doTraining={() => {
             // TODO fetch new song
-            this.setState({ didGameEnd: false });
+            this.setState({ didGameEnd: false, didGameStart: false });
             this.startGame();
           }}
         />
 
-        <Button
-          title="press button to start"
-          onPress={() => this.moveNotes()}
-        />
+        {!this.state.didGameStart && (
+          <Button
+            title="Press any midi key to start"
+            onPress={() => {
+              this.setState({ didGameStart: true });
+              this.moveNotes();
+            }}
+          />
+        )}
         <Board
           unitLength={this.brickUnitLength}
           noteRange={{ first: this.firstNote, last: this.lastNote }}
