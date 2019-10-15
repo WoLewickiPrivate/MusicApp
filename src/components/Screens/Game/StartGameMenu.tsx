@@ -31,29 +31,12 @@ interface Level {
 const song = require('../../../static/sounds/output.json');
 
 class StartGameMenu extends React.Component<Props, State> {
-  static getDerivedStateFromProps(props: Props, state: State) {
-    if (
-      props.levelStars.reduce((total, current) => total + current, 0) !=
-      state.stars
-    ) {
-      return {
-        stars: props.levelStars.reduce((total, current) => total + current, 0),
-        levels: StartGameMenu.makeLevels(props.levelStars),
-      };
-    }
-    return null;
-  }
-
   state: State = {
     stars: 0,
     levels: [],
   };
 
-  static sumElems(total: number, current: number) {
-    return total + current;
-  }
-
-  static makeLevels(levelStars: number[]): Level[] {
+  makeLevels(levelStars: number[]): Level[] {
     const levels: Level[] = [];
     // add levelStars to Reducer after adding level, there will be dispatch method to make it work somehow
     for (let i = 1; i < levelStars.length; i++) {
@@ -89,11 +72,15 @@ class StartGameMenu extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const levels = StartGameMenu.makeLevels(this.props.levelStars);
+    const levels = this.makeLevels(this.props.levelStars);
     this.setState({
       levels,
-      stars: this.props.levelStars.reduce(StartGameMenu.sumElems, 0),
+      stars: this.props.levelStars.reduce(this.sumElems, 0),
     });
+  }
+
+  sumElems(total: number, current: number) {
+    return total + current;
   }
 
   render() {
@@ -103,13 +90,7 @@ class StartGameMenu extends React.Component<Props, State> {
         style={{ width: '100%', height: '100%' }}
       >
         <ScrollView>
-          <View style={styles.container}>
-            <Text style={TutorialTexts.text}>
-              Your have {this.state.stars} star
-              {this.state.stars === 1 ? '' : 's'}!
-            </Text>
-            {this.renderLevelButtons()}
-          </View>
+          <View style={styles.container}>{this.renderLevelButtons()}</View>
         </ScrollView>
       </ImageBackground>
     );
