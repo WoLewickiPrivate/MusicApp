@@ -1,5 +1,5 @@
 import React, { RefObject } from 'react';
-import { StyleSheet, View, Animated } from 'react-native';
+import { StyleSheet, View, Animated, Button } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { AnimatedValue } from 'react-navigation';
@@ -48,6 +48,16 @@ class Level extends React.Component<Props, State> {
   intervalID: any = null;
   starsGained: number = 0;
 
+  board = (
+    <Board
+      unitLength={this.brickUnitLength}
+      noteRange={{ first: this.firstNote, last: this.lastNote }}
+      startPos={0}
+      movingVal={this.state.movingVal}
+      midis={this.state.notes.midisArray}
+    />
+  );
+
   moveNotes() {
     Animated.timing(this.state.movingVal, {
       toValue: calculateSongLength(
@@ -73,7 +83,8 @@ class Level extends React.Component<Props, State> {
     });
   }
 
-  componentDidMount() {
+  startGame() {
+    this.state.movingVal.setValue(0);
     const midisMap = initializeMidiMap(this.state.notes, this.brickUnitLength);
     let previous: Array<number> = [];
 
@@ -89,26 +100,37 @@ class Level extends React.Component<Props, State> {
         );
       }
     }, 10);
+  }
 
-    setTimeout(() => this.moveNotes(), 1000);
+  componentDidMount() {
+    this.startGame();
   }
 
   render() {
     return (
       <View style={styles.container}>
-        {this.state.didGameEnd && (
-          <EndGamePopup
-            navigation={this.props.navigation}
-            levelNumber={this.props.navigation.getParam('levelNumber', 0)}
-            levelStars={this.starsGained}
-            visible={this.state.didGameEnd}
-            isTraining={this.props.navigation.getParam('isTraining', false)}
-            song={this.props.navigation.getParam('noteSequence', {})}
-            startAgain={() => {
-              this.moveNotes();
-            }}
-          />
-        )}
+        <EndGamePopup
+          navigation={this.props.navigation}
+          levelNumber={this.props.navigation.getParam('levelNumber', 0)}
+          levelStars={this.starsGained}
+          visible={this.state.didGameEnd}
+          isTraining={this.props.navigation.getParam('isTraining', false)}
+          song={this.props.navigation.getParam('noteSequence', {})}
+          startAgain={() => {
+            this.setState({ didGameEnd: false });
+            console.log(this.state.didGameEnd);
+            this.startGame();
+          }}
+          goBack={() => {
+            this.setState({ didGameEnd: false });
+            this.props.navigation.goBack();
+          }}
+        />
+
+        <Button
+          title="press button to start"
+          onPress={() => this.moveNotes()}
+        />
         <Board
           unitLength={this.brickUnitLength}
           noteRange={{ first: this.firstNote, last: this.lastNote }}
