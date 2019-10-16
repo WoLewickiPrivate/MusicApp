@@ -26,7 +26,7 @@ class Count extends React.Component<Props> {
     return (
       <View style={{ flexDirection: 'row' }}>
         <Image
-          source={require('../static/profilePicture/star.jpeg')}
+          source={require('../static/profilePicture/star.png')}
           style={{ width: 40, height: 40 }}
         />
         <Text style={{ fontSize: 40 }}>
