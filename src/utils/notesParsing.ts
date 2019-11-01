@@ -47,14 +47,6 @@ function arraysEqual(a: any[], b: any[]) {
   return true;
 }
 
-function onPlay(note: number, pianoElement: RefObject<Piano>) {
-  pianoElement.current!.simulateOnTouchStart(note);
-}
-
-function onStop(note: number, pianoElement: RefObject<Piano>) {
-  pianoElement.current!.simulateOnTouchEnd(note);
-}
-
 function countGainedStars(): number {
   const starsGained = Math.floor(Math.random() * 58) % 4;
   return starsGained;
@@ -64,7 +56,5 @@ export {
   initializeMidiMap,
   calculateSongLength,
   arraysEqual,
-  onStop,
-  onPlay,
   countGainedStars,
 };

@@ -9,8 +9,6 @@ import { tryAddStarsToLevel } from '../../../redux/LevelStarsActions';
 import {
   initializeMidiMap,
   arraysEqual,
-  onPlay,
-  onStop,
   calculateSongLength,
   countGainedStars,
 } from '../../../utils/notesParsing';
@@ -49,15 +47,17 @@ class Level extends React.Component<Props, State> {
   intervalID: any = null;
   starsGained: number = 0;
 
-  board = (
-    <Board
-      unitLength={this.brickUnitLength}
-      noteRange={{ first: this.firstNote, last: this.lastNote }}
-      startPos={0}
-      movingVal={this.state.movingVal}
-      midis={this.state.notes.midisArray}
-    />
-  );
+  touchKey(note: number) {
+    this.pianoElement.current!.simulateOnTouchStart(note);
+  }
+
+  releaseKey(note: number) {
+    this.pianoElement.current!.simulateOnTouchEnd(note);
+  }
+
+  releaseAllKeys() {
+    this.state.notes.midisArray.forEach(val => this.releaseKey(val.pitch));
+  }
 
   moveNotes() {
     Animated.timing(this.state.movingVal, {
@@ -68,9 +68,7 @@ class Level extends React.Component<Props, State> {
       duration: this.state.notes.totalDuration * 1000,
     }).start(() => {
       clearInterval(this.intervalID);
-      this.state.notes.midisArray.forEach(val =>
-        onStop(val.pitch, this.pianoElement),
-      );
+      this.releaseAllKeys();
       if (!this.props.navigation.getParam('isTraining', false)) {
         this.starsGained = countGainedStars();
         if (this.state.levelStars < this.starsGained) {
@@ -94,11 +92,9 @@ class Level extends React.Component<Props, State> {
       const midiIndex = Math.trunc(this.state.movingVal._value);
 
       if (!arraysEqual(previous, midisMap[midiIndex])) {
-        previous.forEach(note => onStop(note, this.pianoElement));
+        previous.forEach(note => this.releaseKey(note));
         previous = midisMap[midiIndex];
-        midisMap[midiIndex].forEach((note: number) =>
-          onPlay(note, this.pianoElement),
-        );
+        midisMap[midiIndex].forEach((note: number) => this.touchKey(note));
       }
     }, 10);
   }
