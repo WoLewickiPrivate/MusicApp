@@ -9,6 +9,10 @@ def read_jwt_cookie_when_refresh():
         def post(self, request, *args, **kwargs):
             if api_settings.JWT_AUTH_COOKIE:
                 request.data['token'] = request.COOKIES.get(api_settings.JWT_AUTH_COOKIE)
+            if 'Authorization' in request.headers:
+                bearer, token = request.headers['Authorization'].split(' ')
+                if bearer == 'Bearer':
+                    request.data['token'] = token
             return super(ReadCookieWhenRefreshJSONWebToken, self).post(request, args, kwargs)
 
     return ReadCookieWhenRefreshJSONWebToken.as_view()

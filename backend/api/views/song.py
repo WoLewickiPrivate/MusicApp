@@ -37,12 +37,14 @@ class SongViewSet(viewsets.ViewSet):
         params = set(request.query_params)
         required_params = {'song_id', 'start_time', 'stop_time'}
         are_required_params = len(required_params - params) == 0
+
+        if not are_required_params:
+            raise RequiredParamsNotProvidedException
+
         song_id = request.query_params.get('song_id')
         start_time = float(request.query_params.get('start_time'))
         stop_time = float(request.query_params.get('stop_time'))
 
-        if not are_required_params:
-            raise RequiredParamsNotProvidedException
 
         file_path = self.get_song_file_path(song_id)
         new_note_sequence = create_song_prototype(file_path, start_time, stop_time)
