@@ -1,18 +1,22 @@
 import React, { RefObject } from 'react';
-import { StyleSheet, View, Animated, Button } from 'react-native';
+import {
+  Animated,
+  Button,
+  DeviceEventEmitter,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-
-import Piano from '../../Piano/Piano';
-import Board from './Board';
 import { tryAddStarsToLevel } from '../../../redux/LevelStarsActions';
+import { Sequence } from '../../../utils/midiConverter';
 import {
-  initializeMidiMap,
-  arraysEqual,
   calculateSongLength,
   countGainedStars,
+  initializeMidiMap,
 } from '../../../utils/notesParsing';
-import { Sequence } from '../../../utils/midiConverter';
+import Piano from '../../Piano/Piano';
+import Board from './Board';
 import EndGamePopup from './EndGamePopup';
 
 interface OwnProps {
@@ -28,6 +32,7 @@ interface State {
   notes: Sequence;
   didGameEnd: boolean;
   didGameStart: boolean;
+  didLevelLoad: boolean;
 }
 
 class Level extends React.Component<Props, State> {
@@ -38,21 +43,26 @@ class Level extends React.Component<Props, State> {
     movingVal: new Animated.Value(0),
     didGameEnd: false,
     didGameStart: false,
+    didLevelLoad: false,
   };
 
   brickUnitLength: number = 50;
   firstNote: string = 'c4';
   lastNote: string = 'c#6';
-  pianoElement: RefObject<Piano> = React.createRef();
   intervalID: any = null;
   starsGained: number = 0;
+  pianoElement: RefObject<Piano> = React.createRef();
+  midiMap: number[][] = initializeMidiMap(
+    this.state.notes,
+    this.brickUnitLength,
+  );
 
   touchKey(note: number) {
-    this.pianoElement.current!.simulateOnTouchStart(note);
+    DeviceEventEmitter.emit('pianoEvent', { type: 1, note: note });
   }
 
   releaseKey(note: number) {
-    this.pianoElement.current!.simulateOnTouchEnd(note);
+    DeviceEventEmitter.emit('pianoEvent', { type: 0, note: note });
   }
 
   releaseAllKeys() {
@@ -84,19 +94,7 @@ class Level extends React.Component<Props, State> {
 
   startGame() {
     this.state.movingVal.setValue(0);
-    const midisMap = initializeMidiMap(this.state.notes, this.brickUnitLength);
-    let previous: Array<number> = [];
-
-    this.intervalID = setInterval(() => {
-      // @ts-ignore
-      const midiIndex = Math.trunc(this.state.movingVal._value);
-
-      if (!arraysEqual(previous, midisMap[midiIndex])) {
-        previous.forEach(note => this.releaseKey(note));
-        previous = midisMap[midiIndex];
-        midisMap[midiIndex].forEach((note: number) => this.touchKey(note));
-      }
-    }, 10);
+    this.setState({ didLevelLoad: true });
   }
 
   componentDidMount() {
@@ -128,7 +126,7 @@ class Level extends React.Component<Props, State> {
           }}
         />
 
-        {!this.state.didGameStart && (
+        {!this.state.didGameStart && this.state.didLevelLoad && (
           <Button
             title="Press any midi key to start"
             onPress={() => {
