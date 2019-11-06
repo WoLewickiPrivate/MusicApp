@@ -9,6 +9,7 @@ import MenuButton from '../../Buttons/MenuButton';
 import TutorialTexts from '../../../styles/Texts/TutorialTexts';
 import { ScrollView } from 'react-native-gesture-handler';
 import convertMidi from '../../../utils/midiConverter';
+import LevelButton from '../../Buttons/LevelButton';
 
 interface OwnProps {
   navigation: Navigation;
@@ -30,29 +31,12 @@ interface Level {
 const song = require('../../../static/sounds/output.json');
 
 class StartGameMenu extends React.Component<Props, State> {
-  static getDerivedStateFromProps(props: Props, state: State) {
-    if (
-      props.levelStars.reduce((total, current) => total + current, 0) !=
-      state.stars
-    ) {
-      return {
-        stars: props.levelStars.reduce((total, current) => total + current, 0),
-        levels: StartGameMenu.makeLevels(props.levelStars),
-      };
-    }
-    return null;
-  }
-
   state: State = {
     stars: 0,
     levels: [],
   };
 
-  static sumElems(total: number, current: number) {
-    return total + current;
-  }
-
-  static makeLevels(levelStars: number[]): Level[] {
+  makeLevels(levelStars: number[]): Level[] {
     const levels: Level[] = [];
     // add levelStars to Reducer after adding level, there will be dispatch method to make it work somehow
     for (let i = 1; i < levelStars.length; i++) {
@@ -69,8 +53,11 @@ class StartGameMenu extends React.Component<Props, State> {
     return this.state.levels.map(({ levelNumber, name, levelStars }, index) => {
       return (
         <Fragment key={index}>
-          <MenuButton
-            text={`${levelNumber}:    ${name}     stars: ${levelStars}`}
+          <LevelButton
+            disabled={this.state.stars < (levelNumber - 1) * 2}
+            stars={levelStars}
+            levelNumber={levelNumber}
+            name={name}
             onPress={() =>
               this.props.navigation.navigate('Level', {
                 levelStars,
@@ -85,11 +72,15 @@ class StartGameMenu extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const levels = StartGameMenu.makeLevels(this.props.levelStars);
+    const levels = this.makeLevels(this.props.levelStars);
     this.setState({
       levels,
-      stars: this.props.levelStars.reduce(StartGameMenu.sumElems, 0),
+      stars: this.props.levelStars.reduce(this.sumElems, 0),
     });
+  }
+
+  sumElems(total: number, current: number) {
+    return total + current;
   }
 
   render() {
@@ -99,13 +90,7 @@ class StartGameMenu extends React.Component<Props, State> {
         style={{ width: '100%', height: '100%' }}
       >
         <ScrollView>
-          <View style={styles.container}>
-            <Text style={TutorialTexts.text}>
-              Your have {this.state.stars} star
-              {this.state.stars === 1 ? '' : 's'}!
-            </Text>
-            {this.renderLevelButtons()}
-          </View>
+          <View style={styles.container}>{this.renderLevelButtons()}</View>
         </ScrollView>
       </ImageBackground>
     );

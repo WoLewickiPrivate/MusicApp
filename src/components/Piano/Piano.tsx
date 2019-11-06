@@ -1,9 +1,10 @@
 import React, { Component, RefObject } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, DeviceEventEmitter } from 'react-native';
 
 import Key from './Key';
 import MidiNumbers from './MidiNumbers';
 import range from '../../utils/rangeUtils';
+import { EventSubscription } from 'fbemitter';
 interface Props {
   noteRange: any;
   onPlayNoteInput: Function;
@@ -19,6 +20,7 @@ interface State {
 }
 
 class Piano extends Component<Props, State> {
+  eventListener: EventSubscription = null;
   state: State = {
     noteRange: {
       first: MidiNumbers.fromNote('c4'),
@@ -40,6 +42,24 @@ class Piano extends Component<Props, State> {
         MidiNumbers.fromNote(noteRange.last) + 1,
       ).map(() => React.createRef<Key>()),
     });
+
+    this.eventListener = DeviceEventEmitter.addListener(
+      'pianoEvent',
+      this.eventHandler,
+    );
+  }
+
+  eventHandler = (event: any) => {
+    if (event.type == 1) {
+      this.simulateOnTouchStart(event.note);
+    }
+    if (event.type == 0) {
+      this.simulateOnTouchEnd(event.note);
+    }
+  };
+
+  componentWillUnmount() {
+    this.eventListener.remove();
   }
 
   getNaturalKeyCount() {

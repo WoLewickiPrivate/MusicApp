@@ -11,7 +11,7 @@ export interface LevelSpec {
 
 const INITIAL_LEVEL_STARS_STATE: LevelStarsReducerState = {
   // first one is never used cause there is no level 0
-  levelStarsCount: [0, 0, 0],
+  levelStarsCount: Array<number>(21).fill(0),
 };
 
 interface LevelStarsAction {

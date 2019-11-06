@@ -16,7 +16,9 @@ interface Props {
   levelNumber: number;
   song: Sequence;
   isTraining: boolean;
-  startAgain: any;
+  startAgain: () => void;
+  goBack: () => void;
+  doTraining: () => void;
 }
 
 interface State {
@@ -25,8 +27,17 @@ interface State {
 
 export default class EndGamePopup extends Component<Props, State> {
   state: State = {
-    visible: true,
+    visible: this.props.visible,
   };
+  static getDerivedStateFromProps(props: Props, state: State) {
+    if (props.visible != state.visible) {
+      return {
+        visible: props.visible,
+      };
+    }
+    return null;
+  }
+
   render() {
     return (
       <Modal
@@ -42,21 +53,19 @@ export default class EndGamePopup extends Component<Props, State> {
       >
         <ModalContent style={{ paddingTop: 10 }}>
           {!this.props.isTraining && (
-            <Text style={{ alignSelf: 'center' }}>
-              Stars gained: {this.props.levelStars}
+            <Text style={{ alignSelf: 'center', fontSize: 20 }}>
+              You gained {this.props.levelStars} stars!
             </Text>
           )}
           <Button
             title="Go back to menu"
             onPress={() => {
-              this.props.navigation.goBack();
-              this.setState({ visible: false });
+              this.props.goBack();
             }}
           />
           <Button
             title="Restart level"
             onPress={() => {
-              this.setState({ visible: false });
               this.props.startAgain();
             }}
           />
@@ -64,11 +73,7 @@ export default class EndGamePopup extends Component<Props, State> {
             title="Train weak elements with different notes"
             onPress={() => {
               this.setState({ visible: false });
-              this.props.navigation.navigate('Level', {
-                levelStars: this.props.levelStars,
-                levelNumber: this.props.levelNumber,
-                noteSequence: this.props.song,
-              });
+              this.props.doTraining();
             }}
           />
         </ModalContent>
