@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { tryAddStarsToLevel } from '../../../redux/LevelStarsActions';
+import { addStarsToLevel } from '../../../redux/LevelStarsActions';
 import { Sequence } from '../../../utils/midiConverter';
 import {
   calculateSongLength,
@@ -327,7 +327,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
     addStarsToLevel: (levelSpec: {
       levelNumber: number;
       starsGained: number;
-    }) => dispatch(tryAddStarsToLevel(levelSpec)),
+    }) => dispatch(addStarsToLevel(levelSpec)),
   };
 }
 

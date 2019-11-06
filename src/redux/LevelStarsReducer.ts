@@ -1,7 +1,7 @@
 import { LevelStarsActions } from './LevelStarsActions';
 
 export interface LevelStarsReducerState {
-  levelStarsCount: number[];
+  levelStarsCount: Array<number>;
 }
 
 export interface LevelSpec {
@@ -24,8 +24,8 @@ export const levelStarsReducer = (
   action: LevelStarsAction,
 ) => {
   switch (action.type) {
-    case LevelStarsActions.TRY_ADD_STARS_TO_LEVEL: {
-      const newArray: number[] = state.levelStarsCount.slice();
+    case LevelStarsActions.ADD_STARS_TO_LEVEL: {
+      let newArray: number[] = state.levelStarsCount.slice();
       newArray[action.levelSpec.levelNumber] = action.levelSpec.starsGained;
       return {
         levelStarsCount: newArray,

@@ -1,27 +1,49 @@
+import { fetchNotes } from '../networking/ServerConnector';
+
 export interface Sequence {
   totalDuration: number;
   midisArray: MidiElement[];
 }
 
-export default function convertSequenceNote(sequence: SequenceNote) {
-  const totalDuration = sequence.total_time ? sequence.total_time : 0;
-  const notesArray = sequence.notes ? sequence.notes : [];
-  const defaultPitch = 60;
+interface NotesSpec {
+  levelNumber: number;
+  noteSequence: SequenceNote;
+}
 
-  const midisArray: Array<MidiElement> = [];
+export async function getLevelNotes(
+  levelNumber: number,
+  levelNotes: Array<SequenceNote | null>,
+  addNotesToLevel: (notesSpec: NotesSpec) => void,
+  token: string,
+): Promise<Sequence> {
+  try {
+    let noteSequence = levelNotes[levelNumber];
+    if (!noteSequence) {
+      noteSequence = await fetchNotes(levelNumber, token);
+      // console.warn(noteSequence);
+      // addNotesToLevel({ levelNumber, noteSequence });
+    }
+    const totalDuration = noteSequence.total_time ? noteSequence.total_time : 0;
+    const notesArray = noteSequence.notes ? noteSequence.notes : [];
+    const defaultPitch = 60;
 
-  if (notesArray) {
-    notesArray.forEach(element => {
-      midisArray.push({
-        start: element.start_time ? element.start_time : 0,
-        end: element.end_time ? element.end_time : totalDuration,
-        pitch: element.pitch ? element.pitch : defaultPitch,
+    const midisArray: Array<MidiElement> = [];
+
+    if (notesArray) {
+      notesArray.forEach(element => {
+        midisArray.push({
+          start: element.start_time ? element.start_time : 0,
+          end: element.end_time ? element.end_time : totalDuration,
+          pitch: element.pitch ? element.pitch : defaultPitch,
+        });
       });
-    });
-  }
+    }
 
-  return {
-    totalDuration,
-    midisArray,
-  };
+    return {
+      totalDuration,
+      midisArray,
+    };
+  } catch (error) {
+    throw new Error(error);
+  }
 }
