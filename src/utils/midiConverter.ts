@@ -4,7 +4,7 @@ export interface Sequence {
 }
 
 export default function convertSequenceNote(sequence: SequenceNote) {
-  const totalDuration = sequence.totalTime ? sequence.totalTime : 0;
+  const totalDuration = sequence.total_time ? sequence.total_time : 0;
   const notesArray = sequence.notes ? sequence.notes : [];
   const defaultPitch = 60;
 
@@ -13,8 +13,8 @@ export default function convertSequenceNote(sequence: SequenceNote) {
   if (notesArray) {
     notesArray.forEach(element => {
       midisArray.push({
-        start: element.startTime ? element.startTime : 0,
-        end: element.endTime ? element.endTime : totalDuration,
+        start: element.start_time ? element.start_time : 0,
+        end: element.end_time ? element.end_time : totalDuration,
         pitch: element.pitch ? element.pitch : defaultPitch,
       });
     });

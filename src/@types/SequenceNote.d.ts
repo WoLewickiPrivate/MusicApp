@@ -27,7 +27,7 @@ interface SequenceNote {
   notes?: INote[] | null;
 
   /** NoteSequence totalTime */
-  totalTime?: number | null;
+  total_time?: number | null;
 
   /** NoteSequence totalQuantizedSteps */
   totalQuantizedSteps?: number | null;
@@ -61,6 +61,9 @@ interface SequenceNote {
 
   /** NoteSequence sequenceMetadata */
   sequenceMetadata?: ISequenceMetadata | null;
+
+  /** Tempo qpm */
+  qpm?: number | null;
 }
 
 interface IQuantizationInfo {
@@ -231,13 +234,13 @@ interface INote {
   velocity?: number | null;
 
   /** Note startTime */
-  startTime?: number | null;
+  start_time?: number | null;
 
   /** Note quantizedStartStep */
   quantizedStartStep?: number | null;
 
   /** Note endTime */
-  endTime?: number | null;
+  end_time?: number | null;
 
   /** Note quantizedEndStep */
   quantizedEndStep?: number | null;

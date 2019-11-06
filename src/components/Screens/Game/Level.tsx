@@ -5,6 +5,7 @@ import {
   DeviceEventEmitter,
   StyleSheet,
   View,
+  Easing,
 } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -52,10 +53,6 @@ class Level extends React.Component<Props, State> {
   intervalID: any = null;
   starsGained: number = 0;
   pianoElement: RefObject<Piano> = React.createRef();
-  midiMap: number[][] = initializeMidiMap(
-    this.state.notes,
-    this.brickUnitLength,
-  );
 
   touchKey(note: number) {
     DeviceEventEmitter.emit('pianoEvent', { type: 1, note: note });
@@ -76,6 +73,7 @@ class Level extends React.Component<Props, State> {
         this.brickUnitLength,
       ),
       duration: this.state.notes.totalDuration * 1000,
+      easing: Easing.inOut(Easing.linear),
     }).start(() => {
       clearInterval(this.intervalID);
       this.releaseAllKeys();
@@ -98,6 +96,10 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    const midiMap: number[][] = initializeMidiMap(
+      this.state.notes,
+      this.brickUnitLength,
+    );
     this.startGame();
   }
 

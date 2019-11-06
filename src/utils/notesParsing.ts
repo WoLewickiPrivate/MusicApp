@@ -13,12 +13,13 @@ function initializeMidiMap(notes: Sequence, brickUnitLength: number) {
       pitch: element.pitch,
     };
   });
+  console.warn(notes);
   const startTime = midis[0].start;
   const endTime = midis[midis.length - 1].end;
 
-  const midisMap: Array<Array<number>> = range(startTime, endTime + 1).map(
-    () => [],
-  );
+  const midisMap: Array<Array<number>> = range(0, endTime + 1).map(() => []);
+
+  console.warn(midis.length);
 
   midis.forEach(element => {
     for (let i = element.start; i < element.end; i++) {
