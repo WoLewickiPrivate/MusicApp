@@ -1,0 +1,4 @@
+#Sat Nov 23 14:37:51 CET 2019
+base.0=C\:\\Users\\Traveler\\Documents\\MusicAppExpo\\android\\app\\build\\intermediates\\transforms\\dexMerger\\release\\0
+path.0=classes.dex
+renamed.0=classes.dex

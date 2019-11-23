@@ -1,53 +1,44 @@
 Arguments: 
-  /usr/bin/node /home/wolewicki/.yarn/bin/yarn.js add --dev @types/react-native-modals
+  C:\Program Files\nodejs\node.exe C:\Users\Traveler\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add https://github.com/PatrykTraveler/SoundModule.git
 
 PATH: 
-  /home/wolewicki/.yarn/bin:/home/wolewicki/.config/yarn/global/node_modules/.bin:/home/wolewicki/.yarn/bin:/home/wolewicki/.config/yarn/global/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/wolewicki/Android/Sdk/emulator:/home/wolewicki/Android/Sdk/tools:/home/wolewicki/Android/Sdk/tools/bin:/home/wolewicki/Android/Sdk/platform-tools:/home/wolewicki/Android/Sdk/emulator:/home/wolewicki/Android/Sdk/tools:/home/wolewicki/Android/Sdk/tools/bin:/home/wolewicki/Android/Sdk/platform-tools
+  C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\Traveler\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\libnvvp;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\PuTTY;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\ZeroC\Ice-3.7.2\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2019.3.0;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\extras\CUPTI\libx64;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\include;C:\tools\cuda\bin;C:\Users\Traveler\AppData\Local\Android\Sdk\platform-tools;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\IVI Foundation\VISA\WinNT\Bin;C:\Users\Traveler\AppData\Local\Programs\Python\Python37\Scripts;C:\Users\Traveler\AppData\Local\Programs\Python\Python37;C:\Users\Traveler\.cargo\bin;C:\Users\Traveler\AppData\Local\Microsoft\WindowsApps;C:\Users\Traveler\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Traveler\AppData\Local\Julia-1.0.3\bin;C:\Program Files\Java\jdk1.8.0_191\bin;C:\Users\Traveler\.babun;C:\Users\Traveler\AppData\Roaming\npm;C:\Users\Traveler\AppData\Local\atom\bin;C:\protoc-3.7.1-win64\bin;C:\tools\cuda\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\bin;C:\Python27;C:\apache-maven-3.6.2\bin
 
 Yarn version: 
   1.19.0
 
 Node version: 
-  8.10.0
+  10.15.0
 
 Platform: 
-  linux x64
+  win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2freact-native-modals: Not found
-      at Request.params.callback [as _callback] (/home/wolewicki/.yarn/lib/cli.js:66918:18)
-      at Request.self.callback (/home/wolewicki/.yarn/lib/cli.js:140539:22)
-      at emitTwo (events.js:126:13)
-      at Request.emit (events.js:214:7)
-      at Request.<anonymous> (/home/wolewicki/.yarn/lib/cli.js:141511:10)
-      at emitOne (events.js:116:13)
-      at Request.emit (events.js:211:7)
-      at IncomingMessage.<anonymous> (/home/wolewicki/.yarn/lib/cli.js:141433:12)
-      at Object.onceWrapper (events.js:313:30)
-      at emitNone (events.js:111:20)
+  Error: EPERM: operation not permitted, unlink 'C:\Users\Traveler\Documents\MusicAppExpo\node_modules\@babel\plugin-transform-runtime\node_modules\.bin'
 
 npm manifest: 
   {
-    "main": "node_modules/expo/AppEntry.js",
     "scripts": {
-      "start": "expo start",
-      "android": "expo start --android",
-      "ios": "expo start --ios",
-      "web": "expo start --web",
-      "eject": "expo eject"
+      "start": "react-native start",
+      "android": "react-native run-android",
+      "ios": "react-native run-ios",
+      "web": "expo start --web"
     },
     "dependencies": {
-      "@react-native-community/async-storage": "^1.6.2",
       "expo": "^35.0.0",
-      "expo-secure-store": "^7.0.0",
-      "midi-converter": "^0.1.5",
       "react": "16.8.3",
       "react-dom": "16.8.3",
-      "react-native": "https://github.com/expo/react-native/archive/sdk-35.0.0.tar.gz",
-      "react-native-fs": "^2.14.1",
+      "react-native": "0.59.10",
       "react-native-gesture-handler": "~1.3.0",
-      "react-native-modals": "^0.19.8",
+      "react-native-reanimated": "~1.3.0",
+      "react-native-screens": "1.0.0-alpha.23",
+      "react-native-unimodules": "0.6.0",
       "react-native-web": "^0.11.7",
+      "@react-native-community/async-storage": "^1.6.2",
+      "expo-secure-store": "^7.0.0",
+      "midi-converter": "^0.1.5",
+      "react-native-fs": "^2.14.1",
+      "react-native-modals": "^0.19.8",
       "react-navigation": "^4.0.10",
       "react-navigation-stack": "^1.9.1",
       "react-redux": "^7.1.1",
@@ -66,6 +57,7 @@ npm manifest:
       "eslint-plugin-prettier": "3.1.0",
       "eslint-plugin-react": "^7.14.2",
       "jest": "24.1.0",
+      "jetifier": "^1.6.4",
       "prettier": "1.18.2",
       "react-test-renderer": "^16.8.6",
       "ts-jest": "^24.0.2",
@@ -4529,6 +4521,11 @@ Lockfile:
       import-local "^2.0.0"
       jest-cli "^24.1.0"
   
+  jetifier@^1.6.4:
+    version "1.6.4"
+    resolved "https://registry.yarnpkg.com/jetifier/-/jetifier-1.6.4.tgz#6159db8e275d97980d26162897a0648b6d4a3222"
+    integrity sha512-+f/4OLeqY8RAmXnonI1ffeY1DR8kMNJPhv5WMFehchf7U71cjMQVKkOz1n6asz6kfVoAqKNWJz1A/18i18AcXA==
+  
   js-levenshtein@^1.1.3:
     version "1.1.6"
     resolved "https://registry.yarnpkg.com/js-levenshtein/-/js-levenshtein-1.1.6.tgz#c6cee58eb3550372df8deb85fad5ce66ce01d59d"
@@ -6256,6 +6253,11 @@ Lockfile:
       prop-types "^15.6.0"
       react-native-root-siblings "^3.2.2"
   
+  react-native-reanimated@~1.3.0:
+    version "1.3.2"
+    resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.3.2.tgz#3f050e61cad6173ea584517b7b981f17f442aa19"
+    integrity sha512-wDxI2N9YLZRmH/n9UIah7RnGSCZJcbKa4mylf2+2pPjicDJAlyjljGAkHOwUlSOol8x14fUp5m65TS9eVZNmZQ==
+  
   react-native-root-siblings@^3.2.2:
     version "3.2.3"
     resolved "https://registry.yarnpkg.com/react-native-root-siblings/-/react-native-root-siblings-3.2.3.tgz#df5a1cff3a3a1f433f57320e1cae719f1b15a3f2"
@@ -6271,12 +6273,36 @@ Lockfile:
     dependencies:
       hoist-non-react-statics "^2.3.1"
   
-  "react-native-screens@^1.0.0 || ^1.0.0-alpha":
+  react-native-screens@1.0.0-alpha.23, "react-native-screens@^1.0.0 || ^1.0.0-alpha":
     version "1.0.0-alpha.23"
     resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-1.0.0-alpha.23.tgz#25d7ea4d11bda4fcde2d1da7ae50271c6aa636e0"
     integrity sha512-tOxHGQUN83MTmQB4ghoQkibqOdGiX4JQEmeyEv96MKWO/x8T2PJv84ECUos9hD3blPRQwVwSpAid1PPPhrVEaw==
     dependencies:
       debounce "^1.2.0"
+  
+  react-native-unimodules@0.6.0:
+    version "0.6.0"
+    resolved "https://registry.yarnpkg.com/react-native-unimodules/-/react-native-unimodules-0.6.0.tgz#f62c753705f4b97ba19e2834d8ad3357e204537c"
+    integrity sha512-b563vqelTLtagFLWiI428rUTx4BxWpytlsEC1xcAQdf8chtnVr7QrkRXatiIvJmDAYLL8l+8UxdBW9e0f2rZ9Q==
+    dependencies:
+      "@unimodules/core" "~4.0.0"
+      "@unimodules/react-native-adapter" "~4.0.0"
+      chalk "^2.4.2"
+      expo-app-loader-provider "~7.0.0"
+      expo-asset "~7.0.0"
+      expo-constants "~7.0.0"
+      expo-file-system "~7.0.0"
+      expo-permissions "~7.0.0"
+      unimodules-barcode-scanner-interface "~4.0.0"
+      unimodules-camera-interface "~4.0.0"
+      unimodules-constants-interface "~4.0.0"
+      unimodules-face-detector-interface "~4.0.0"
+      unimodules-file-system-interface "~4.0.0"
+      unimodules-font-interface "~4.0.0"
+      unimodules-image-loader-interface "~4.0.0"
+      unimodules-permissions-interface "~4.0.0"
+      unimodules-sensors-interface "~4.0.0"
+      unimodules-task-manager-interface "~4.0.0"
   
   react-native-view-shot@2.6.0:
     version "2.6.0"
@@ -6299,9 +6325,10 @@ Lockfile:
       prop-types "^15.6.0"
       react-timer-mixin "^0.13.4"
   
-  "react-native@https://github.com/expo/react-native/archive/sdk-35.0.0.tar.gz":
-    version "0.59.8"
-    resolved "https://github.com/expo/react-native/archive/sdk-35.0.0.tar.gz#cf62758ae75b5df304836ad9971239abdb240587"
+  react-native@0.59.10:
+    version "0.59.10"
+    resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.59.10.tgz#352f381e382f93a0403be499c9e384bf51c2591c"
+    integrity sha512-guB9YW+pBqS1dnfZ4ntzjINopiCUAbdmshU2wMWD1W32fRczLAopi/7Q2iHKP8LTCdxuYZV3fa9Mew5PSuANAw==
     dependencies:
       "@babel/runtime" "^7.0.0"
       "@react-native-community/cli" "^1.2.1"
@@ -6349,7 +6376,7 @@ Lockfile:
       semver "^5.0.3"
       serve-static "^1.13.1"
       shell-quote "1.6.1"
-      stacktrace-parser "0.1.4"
+      stacktrace-parser "^0.1.3"
       ws "^1.1.5"
       xmldoc "^0.4.0"
       yargs "^9.0.0"
@@ -7116,10 +7143,12 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/stack-utils/-/stack-utils-1.0.2.tgz#33eba3897788558bebfc2db059dc158ec36cebb8"
     integrity sha512-MTX+MeG5U994cazkjd/9KNAapsHnibjMLnfXodlkXw76JEea0UiNzrqidzo1emMwk7w5Qhc9jd4Bn9TBb1MFwA==
   
-  stacktrace-parser@0.1.4:
-    version "0.1.4"
-    resolved "https://registry.yarnpkg.com/stacktrace-parser/-/stacktrace-parser-0.1.4.tgz#01397922e5f62ecf30845522c95c4fe1d25e7d4e"
-    integrity sha1-ATl5IuX2Ls8whFUiyVxP4dJefU4=
+  stacktrace-parser@^0.1.3:
+    version "0.1.7"
+    resolved "https://registry.yarnpkg.com/stacktrace-parser/-/stacktrace-parser-0.1.7.tgz#9ed005638a5e79dcf256611da1dfb4871e6fd14d"
+    integrity sha512-Evm+NuZ2ZTwGazsbsZC+EV1EGsvyxgIvtNwbyFfeXaq/8L78M5Kdh0qpmQaTkUpbOAKbbPP7c7qZa7u8XFsrUA==
+    dependencies:
+      type-fest "^0.7.1"
   
   static-container@^1.0.0:
     version "1.5.1"
@@ -7500,6 +7529,11 @@ Lockfile:
     integrity sha1-WITKtRLPHTVeP7eE8wgEsrUg23I=
     dependencies:
       prelude-ls "~1.1.2"
+  
+  type-fest@^0.7.1:
+    version "0.7.1"
+    resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.7.1.tgz#8dda65feaf03ed78f0a3f9678f1869147f7c5c48"
+    integrity sha512-Ne2YiiGN8bmrmJJEuTWTLJR32nh/JdL1+PSicowtNb0WFpn59GK8/lfD61bVtzguz7b3PBt74nxpv/Pw5po5Rg==
   
   typedarray@^0.0.6:
     version "0.0.6"

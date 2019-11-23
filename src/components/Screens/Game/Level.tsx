@@ -21,6 +21,7 @@ import Board from './Board';
 import EndGamePopup from './EndGamePopup';
 import range from '../../../utils/rangeUtils';
 import MidiNumbers from '../../Piano/MidiNumbers';
+import { init } from 'react-native-sound-module';
 
 interface OwnProps {
   navigation: Navigation;
@@ -150,6 +151,8 @@ class Level extends React.Component<Props, State> {
     this.ws.onmessage = e => {
       this.simulateNoteTouch(parseInt(e.data));
     };
+
+    init(this.touchKey, this.releaseKey, () => {});
 
     this.startGame();
   }
