@@ -13,21 +13,20 @@ function initializeMidiMap(notes: Sequence, brickUnitLength: number) {
       pitch: element.pitch,
     };
   });
-  console.warn(notes);
-  const startTime = midis[0].start;
-  const endTime = midis[midis.length - 1].end;
+  // const startTime = midis[0].start;
+  // const endTime = midis[midis.length - 1].end;
 
-  const midisMap: Array<Array<number>> = range(0, endTime + 1).map(() => []);
+  // const midisMap: Array<Array<number>> = range(0, endTime + 1).map(() => []);
+  // console.warn(midisMap.length);
 
-  console.warn(midis.length);
+  // midis.forEach(element => {
+  //   console.warn(element.start, element.end);
+  //   for (let i = element.start; i < element.end; i++) {
+  //     midisMap[i].push(element.pitch);
+  //   }
+  // });
 
-  midis.forEach(element => {
-    for (let i = element.start; i < element.end; i++) {
-      midisMap[i].push(element.pitch);
-    }
-  });
-
-  return midisMap;
+  return midis;
 }
 
 function calculateSongLength(

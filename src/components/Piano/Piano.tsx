@@ -7,8 +7,6 @@ import range from '../../utils/rangeUtils';
 import { EventSubscription } from 'fbemitter';
 interface Props {
   noteRange: any;
-  onPlayNoteInput: Function;
-  onStopNoteInput: Function;
 }
 
 interface State {
@@ -125,8 +123,6 @@ class Piano extends Component<Props, State> {
               midiNumber={midiNumber}
               noteRange={this.state.noteRange}
               accidental={isAccidental}
-              onPlayNoteInput={this.props.onPlayNoteInput}
-              onStopNoteInput={this.props.onStopNoteInput}
               useTouchEvents={true}
             />
           );

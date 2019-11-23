@@ -1,15 +1,12 @@
 import React, { Fragment } from 'react';
-import { Text, View, ImageBackground } from 'react-native';
-
+import { ImageBackground, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
-
 import { RootReducerState } from '../../../redux/RootReducer';
 import styles from '../../../styles/Menu/MenuMainStyle';
-import MenuButton from '../../Buttons/MenuButton';
-import TutorialTexts from '../../../styles/Texts/TutorialTexts';
-import { ScrollView } from 'react-native-gesture-handler';
 import convertMidi from '../../../utils/midiConverter';
 import LevelButton from '../../Buttons/LevelButton';
+import { get } from '../../../networking/ServerConnector';
 
 interface OwnProps {
   navigation: Navigation;
@@ -47,6 +44,12 @@ class StartGameMenu extends React.Component<Props, State> {
       });
     }
     return levels;
+  }
+
+  fetchSong() {
+    fetch(
+      '192.168.2.180:8000/songs/create_song?song_id=2&start_time=4.2&stop_time=33.0',
+    ).then(value => console.warn(value));
   }
 
   renderLevelButtons() {

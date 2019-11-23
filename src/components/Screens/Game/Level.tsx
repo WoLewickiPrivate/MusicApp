@@ -19,6 +19,8 @@ import {
 import Piano from '../../Piano/Piano';
 import Board from './Board';
 import EndGamePopup from './EndGamePopup';
+import range from '../../../utils/rangeUtils';
+import MidiNumbers from '../../Piano/MidiNumbers';
 
 interface OwnProps {
   navigation: Navigation;
@@ -48,11 +50,13 @@ class Level extends React.Component<Props, State> {
   };
 
   brickUnitLength: number = 50;
-  firstNote: string = 'c4';
-  lastNote: string = 'c#6';
+  firstNote: string = 'a4';
+  lastNote: string = 'g4';
   intervalID: any = null;
   starsGained: number = 0;
-  pianoElement: RefObject<Piano> = React.createRef();
+  ws = new WebSocket('ws://192.168.1.13:8765');
+  midisMap: Array<{ start: number; end: number; pitch: number }> = [];
+  touchEvents: Array<{ note: number; index: number }> = [];
 
   touchKey(note: number) {
     DeviceEventEmitter.emit('pianoEvent', { type: 1, note: note });
@@ -60,6 +64,39 @@ class Level extends React.Component<Props, State> {
 
   releaseKey(note: number) {
     DeviceEventEmitter.emit('pianoEvent', { type: 0, note: note });
+  }
+
+  simulateNoteTouch(note: number) {
+    this.touchKey(note);
+    if (this.state.didGameStart) {
+      const midiIndex = Math.trunc(this.state.movingVal._value);
+      this.touchEvents.push({ note: note, index: midiIndex });
+    }
+
+    setTimeout(() => this.releaseKey(note), 50);
+  }
+
+  definePianoBoundaries() {
+    const onlyPitches = this.state.notes.midisArray.map(event => event.pitch);
+    this.firstNote = MidiNumbers.midiToNoteName(Math.min(...onlyPitches));
+    this.lastNote = MidiNumbers.midiToNoteName(Math.max(...onlyPitches));
+  }
+
+  getPoints() {
+    const firstMidi = MidiNumbers.fromNote(this.firstNote);
+    const lastMidi = MidiNumbers.fromNote(this.lastNote);
+    let noteMap: Array<Array<{ start: number; end: number }>> = range(
+      firstMidi,
+      lastMidi + 1,
+    ).map(() => []);
+    this.midisMap.forEach(event => {
+      noteMap[event.pitch - firstMidi].push({
+        start: event.start,
+        end: event.end,
+      });
+    });
+
+    return noteMap;
   }
 
   releaseAllKeys() {
@@ -91,16 +128,34 @@ class Level extends React.Component<Props, State> {
   }
 
   startGame() {
+    this.midisMap = initializeMidiMap(this.state.notes, this.brickUnitLength);
+    //this.getPoints();
+    console.log(this.getPoints());
+
     this.state.movingVal.setValue(0);
     this.setState({ didLevelLoad: true });
   }
 
+  componentWillMount() {
+    this.definePianoBoundaries();
+  }
+
   componentDidMount() {
-    const midiMap: number[][] = initializeMidiMap(
-      this.state.notes,
-      this.brickUnitLength,
-    );
+    this.ws.onopen = () => {
+      // connection opened
+      console.warn('Opened');
+      this.ws.send('something'); // send a message
+    };
+
+    this.ws.onmessage = e => {
+      this.simulateNoteTouch(parseInt(e.data));
+    };
+
     this.startGame();
+  }
+
+  componentWillUnmount() {
+    this.ws.close();
   }
 
   render() {
@@ -144,17 +199,18 @@ class Level extends React.Component<Props, State> {
           movingVal={this.state.movingVal}
           midis={this.state.notes.midisArray}
         />
-        <Piano
-          ref={this.pianoElement}
-          noteRange={{ first: this.firstNote, last: this.lastNote }}
-          onPlayNoteInput={() => {}}
-          onStopNoteInput={() => {}}
-        />
+        <Piano noteRange={{ first: this.firstNote, last: this.lastNote }} />
       </View>
     );
   }
 }
 export type ReduxProps = ReturnType<typeof mapDispatchToProps>;
+
+function findClosestInArray(array: Array<number>, goal: number) {
+  return array.reduce((prev, curr) =>
+    Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev,
+  );
+}
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
