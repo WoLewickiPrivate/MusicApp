@@ -14,7 +14,6 @@ import { Sequence } from '../../../utils/midiConverter';
 import {
   calculateSongLength,
   countGainedStars,
-  initializeMidiMap,
 } from '../../../utils/notesParsing';
 import Piano from '../../Piano/Piano';
 import Board from './Board';
@@ -55,7 +54,7 @@ class Level extends React.Component<Props, State> {
   intervalID: any = null;
   starsGained: number = 0;
   ws = new WebSocket('ws://192.168.1.13:8765');
-  midisMap: Array<{ start: number; end: number; pitch: number }> = [];
+  changePointsMap: Array<Array<{ start: number; end: number }>> = [];
   touchEvents: Array<{ note: number; index: number }> = [];
 
   touchKey(note: number) {
@@ -64,6 +63,10 @@ class Level extends React.Component<Props, State> {
 
   releaseKey(note: number) {
     DeviceEventEmitter.emit('pianoEvent', { type: 0, note: note });
+  }
+
+  releaseAllKeys() {
+    this.state.notes.midisArray.forEach(val => this.releaseKey(val.pitch));
   }
 
   simulateNoteTouch(note: number) {
@@ -76,31 +79,42 @@ class Level extends React.Component<Props, State> {
     setTimeout(() => this.releaseKey(note), 50);
   }
 
+  checkAccuracy(note: number) {
+    const midiIndex = Math.trunc(this.state.movingVal._value);
+    let pointOfChange = findClosestInArray(
+      this.changePointsMap[note],
+      midiIndex,
+    );
+    let closestPointIndex = this.changePointsMap[note].findIndex(
+      value => value.start < midiIndex,
+    );
+    if (closestPointIndex == -1) {
+      return false;
+    }
+    return this.changePointsMap[note][closestPointIndex].end > midiIndex;
+  }
+
   definePianoBoundaries() {
     const onlyPitches = this.state.notes.midisArray.map(event => event.pitch);
     this.firstNote = MidiNumbers.midiToNoteName(Math.min(...onlyPitches));
     this.lastNote = MidiNumbers.midiToNoteName(Math.max(...onlyPitches));
   }
 
-  getPoints() {
+  initChangePointsMap() {
     const firstMidi = MidiNumbers.fromNote(this.firstNote);
     const lastMidi = MidiNumbers.fromNote(this.lastNote);
     let noteMap: Array<Array<{ start: number; end: number }>> = range(
       firstMidi,
       lastMidi + 1,
     ).map(() => []);
-    this.midisMap.forEach(event => {
-      noteMap[event.pitch - firstMidi].push({
-        start: event.start,
-        end: event.end,
+    this.state.notes.midisArray.map(element => {
+      noteMap[element.pitch - firstMidi].push({
+        start: Math.trunc(element.start * this.brickUnitLength),
+        end: Math.trunc(element.end * this.brickUnitLength),
       });
     });
 
-    return noteMap;
-  }
-
-  releaseAllKeys() {
-    this.state.notes.midisArray.forEach(val => this.releaseKey(val.pitch));
+    this.changePointsMap = noteMap;
   }
 
   moveNotes() {
@@ -128,10 +142,7 @@ class Level extends React.Component<Props, State> {
   }
 
   startGame() {
-    this.midisMap = initializeMidiMap(this.state.notes, this.brickUnitLength);
-    //this.getPoints();
-    console.log(this.getPoints());
-
+    this.initChangePointsMap();
     this.state.movingVal.setValue(0);
     this.setState({ didLevelLoad: true });
   }
@@ -206,10 +217,12 @@ class Level extends React.Component<Props, State> {
 }
 export type ReduxProps = ReturnType<typeof mapDispatchToProps>;
 
-function findClosestInArray(array: Array<number>, goal: number) {
-  return array.reduce((prev, curr) =>
-    Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev,
-  );
+function findClosestInArray(
+  array: Array<{ start: number; end: number }>,
+  goal: number,
+) {
+  const index = array.findIndex(value => value.start < goal);
+  return index > 0 ? index - 1 : -1;
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
