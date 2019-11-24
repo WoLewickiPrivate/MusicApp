@@ -6,7 +6,6 @@ import { RootReducerState } from '../../../redux/RootReducer';
 import styles from '../../../styles/Menu/MenuMainStyle';
 import convertMidi from '../../../utils/midiConverter';
 import LevelButton from '../../Buttons/LevelButton';
-import { get } from '../../../networking/ServerConnector';
 
 interface OwnProps {
   navigation: Navigation;
