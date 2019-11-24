@@ -1,13 +1,9 @@
 import React, { Fragment } from 'react';
-import { Text, View, ImageBackground } from 'react-native';
-
+import { ImageBackground, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
-
 import { RootReducerState } from '../../../redux/RootReducer';
 import styles from '../../../styles/Menu/MenuMainStyle';
-import MenuButton from '../../Buttons/MenuButton';
-import TutorialTexts from '../../../styles/Texts/TutorialTexts';
-import { ScrollView } from 'react-native-gesture-handler';
 import convertMidi from '../../../utils/midiConverter';
 import LevelButton from '../../Buttons/LevelButton';
 

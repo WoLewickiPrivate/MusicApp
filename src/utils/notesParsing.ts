@@ -5,30 +5,6 @@ import { Sequence } from '../utils/midiConverter';
 import range from '../utils/rangeUtils';
 import Piano from '../components/Piano/Piano';
 
-function initializeMidiMap(notes: Sequence, brickUnitLength: number) {
-  const midis = notes.midisArray.map(element => {
-    return {
-      start: Math.trunc(element.start * brickUnitLength),
-      end: Math.trunc(element.end * brickUnitLength),
-      pitch: element.pitch,
-    };
-  });
-  const startTime = midis[0].start;
-  const endTime = midis[midis.length - 1].end;
-
-  const midisMap: Array<Array<number>> = range(startTime, endTime + 1).map(
-    () => [],
-  );
-
-  midis.forEach(element => {
-    for (let i = element.start; i < element.end; i++) {
-      midisMap[i].push(element.pitch);
-    }
-  });
-
-  return midisMap;
-}
-
 function calculateSongLength(
   totalDuration: number,
   brickUnitLength: number,
@@ -52,9 +28,4 @@ function countGainedStars(): number {
   return starsGained;
 }
 
-export {
-  initializeMidiMap,
-  calculateSongLength,
-  arraysEqual,
-  countGainedStars,
-};
+export { calculateSongLength, arraysEqual, countGainedStars };

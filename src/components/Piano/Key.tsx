@@ -7,8 +7,6 @@ interface Props {
   naturalKeyWidth: number; // Width as a ratio between 0 and 1
   useTouchEvents: boolean;
   accidental: boolean;
-  onPlayNoteInput: Function;
-  onStopNoteInput: Function;
   pitchPositions: { [id: string]: number };
   accidentalWidthRatio: number;
   noteRange: any;
@@ -49,22 +47,12 @@ class Key extends React.Component<Props> {
     this.setState({
       touched: true,
     });
-
-    this.props.onPlayNoteInput(
-      MidiNumbers.midiToNoteName(this.props.midiNumber),
-      this.props.midiNumber,
-    );
   };
 
   onStopNoteInput = () => {
     this.setState({
       touched: false,
     });
-
-    this.props.onStopNoteInput(
-      MidiNumbers.midiToNoteName(this.props.midiNumber),
-      this.props.midiNumber,
-    );
   };
 
   // Key position is represented by the number of natural key widths from the left
