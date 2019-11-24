@@ -53,12 +53,21 @@ class Level extends React.Component<Props, State> {
   lastNote: string = 'g4';
   intervalID: any = null;
   starsGained: number = 0;
-  ws = new WebSocket('ws://192.168.1.13:8765');
+  ws = new WebSocket('ws://192.168.2.160:8765');
   changePointsMap: Array<Array<{ start: number; end: number }>> = [];
   touchEvents: Array<{ note: number; index: number }> = [];
 
   touchKey(note: number) {
     DeviceEventEmitter.emit('pianoEvent', { type: 1, note: note });
+    console.log(this.checkAccuracy(note));
+    if (this.checkAccuracy(note)) {
+      const midiIndex = Math.trunc(this.state.movingVal._value);
+      DeviceEventEmitter.emit('brickEvent', {
+        type: 1,
+        note: note,
+        pos: midiIndex,
+      });
+    }
   }
 
   releaseKey(note: number) {
@@ -80,18 +89,23 @@ class Level extends React.Component<Props, State> {
   }
 
   checkAccuracy(note: number) {
+    const firstMidi = MidiNumbers.fromNote(this.firstNote);
     const midiIndex = Math.trunc(this.state.movingVal._value);
-    let pointOfChange = findClosestInArray(
-      this.changePointsMap[note],
-      midiIndex,
-    );
-    let closestPointIndex = this.changePointsMap[note].findIndex(
-      value => value.start < midiIndex,
+    let closestPointIndex = this.changePointsMap[note - firstMidi].findIndex(
+      value => value.end > midiIndex,
     );
     if (closestPointIndex == -1) {
       return false;
     }
-    return this.changePointsMap[note][closestPointIndex].end > midiIndex;
+    console.log(
+      this.changePointsMap[note - firstMidi][closestPointIndex].start,
+      this.changePointsMap[note - firstMidi][closestPointIndex].end,
+      midiIndex,
+    );
+    return (
+      this.changePointsMap[note - firstMidi][closestPointIndex].start <
+      midiIndex
+    );
   }
 
   definePianoBoundaries() {
@@ -142,7 +156,6 @@ class Level extends React.Component<Props, State> {
   }
 
   startGame() {
-    this.initChangePointsMap();
     this.state.movingVal.setValue(0);
     this.setState({ didLevelLoad: true });
   }
@@ -152,6 +165,8 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    this.initChangePointsMap();
+    console.log(this.changePointsMap);
     this.ws.onopen = () => {
       // connection opened
       console.warn('Opened');

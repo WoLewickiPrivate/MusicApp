@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, DeviceEventEmitter } from 'react-native';
 import MidiNumbers from '../../Piano/MidiNumbers';
+import { EventSubscription } from 'fbemitter';
 
 interface Props {
   midiNumber: number;
@@ -13,7 +14,11 @@ interface Props {
   accidentalWidthRatio: number;
 }
 
-export default class Brick extends Component<Props> {
+interface State {
+  brickState: number;
+}
+
+export default class Brick extends Component<Props, State> {
   public static defaultProps = {
     accidentalWidthRatio: 0.65,
     pitchPositions: {
@@ -30,6 +35,33 @@ export default class Brick extends Component<Props> {
       Bb: 5.85,
       B: 6,
     },
+  };
+
+  eventListener: EventSubscription = null;
+  state: State = {
+    brickState: -1,
+  };
+
+  componentDidMount() {
+    this.eventListener = DeviceEventEmitter.addListener(
+      'brickEvent',
+      this.eventHandler,
+    );
+  }
+
+  eventHandler = (event: any) => {
+    if (event.note == this.props.midiNumber) {
+      if (
+        event.type == 1 &&
+        event.pos > this.props.top &&
+        event.pos < this.props.top + this.props.height
+      ) {
+        this.setState({ brickState: 1 });
+      }
+      if (event.type == 0) {
+        this.setState({ brickState: 0 });
+      }
+    }
   };
 
   getAbsoluteKeyPosition(midiNumber: number) {
@@ -61,9 +93,11 @@ export default class Brick extends Component<Props> {
       <View
         style={[
           styles.ReactPiano__Key,
-          accidental
-            ? styles.ReactPiano__Key__accidental
-            : styles.ReactPiano__Key__natural,
+          this.state.brickState == -1
+            ? styles.ReactPiano__Key__grey
+            : this.state.brickState == 0
+            ? styles.ReactPiano__Key__red
+            : styles.ReactPiano__Key__green,
           {
             top: top,
             left: ratioToPercentage(
@@ -92,11 +126,16 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderRadius: 5,
   },
-  ReactPiano__Key__natural: {
-    backgroundColor: '#0000ff',
+  ReactPiano__Key__grey: {
+    backgroundColor: '#808080',
+  },
+  ReactPiano__Key__red: {
+    backgroundColor: '#FF0000',
+  },
+  ReactPiano__Key__green: {
+    backgroundColor: '#7CFC00',
   },
   ReactPiano__Key__accidental: {
-    backgroundColor: '#00008b',
     zIndex: 1,
   },
 });

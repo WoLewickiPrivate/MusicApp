@@ -46,12 +46,6 @@ class StartGameMenu extends React.Component<Props, State> {
     return levels;
   }
 
-  fetchSong() {
-    fetch(
-      '192.168.2.180:8000/songs/create_song?song_id=2&start_time=4.2&stop_time=33.0',
-    ).then(value => console.warn(value));
-  }
-
   renderLevelButtons() {
     return this.state.levels.map(({ levelNumber, name, levelStars }, index) => {
       return (

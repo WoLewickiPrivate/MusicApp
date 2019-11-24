@@ -28,9 +28,4 @@ function countGainedStars(): number {
   return starsGained;
 }
 
-export {
-  initializeMidiMap,
-  calculateSongLength,
-  arraysEqual,
-  countGainedStars,
-};
+export { calculateSongLength, arraysEqual, countGainedStars };
