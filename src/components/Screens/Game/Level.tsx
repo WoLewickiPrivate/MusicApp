@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { tryAddStarsToLevel } from '../../../redux/LevelStarsActions';
+import { addStarsToLevel } from '../../../redux/LevelStarsActions';
 import { Sequence } from '../../../utils/midiConverter';
 import {
   calculateSongLength,
@@ -41,7 +41,7 @@ interface State {
 
 class Level extends React.Component<Props, State> {
   state: State = {
-    levelStars: this.props.navigation.getParam('levelStars'),
+    levelStars: this.props.navigation.getParam('levelStars', 0),
     notes: this.props.navigation.getParam('noteSequence', {}),
     noteIndex: 0,
     movingVal: new Animated.Value(0),
@@ -57,7 +57,7 @@ class Level extends React.Component<Props, State> {
   intervalID: any = null;
   starsGained: number = 0;
   //@ts-ignore
-  ws = new WebSocket('ws://192.168.2.160:8765');
+  ws = new WebSocket('ws://192.168.2.182:8765');
   changePointsMap: Array<Array<{ start: number; end: number }>> = [];
   noteStack: Array<MidiElement> = [];
   longestStrike: number = 0;
@@ -243,11 +243,15 @@ class Level extends React.Component<Props, State> {
 
   initWebSocket() {
     this.ws.onopen = () => {
-      console.warn('Socket opened');
+      console.log('Socket opened');
       this.ws.send('something'); // send a message
     };
 
-    this.ws.onmessage = e => {
+    this.ws.onmessage = (e: { data: string }) => {
+      if (!this.state.didGameStart) {
+        this.setState({ didGameStart: true })
+        this.moveNotes();
+      }
       this.simulateNoteTouch(parseInt(e.data));
     };
   }
@@ -327,7 +331,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
     addStarsToLevel: (levelSpec: {
       levelNumber: number;
       starsGained: number;
-    }) => dispatch(tryAddStarsToLevel(levelSpec)),
+    }) => dispatch(addStarsToLevel(levelSpec)),
   };
 }
 

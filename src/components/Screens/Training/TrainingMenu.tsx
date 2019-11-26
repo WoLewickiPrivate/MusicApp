@@ -2,8 +2,9 @@ import React from 'react';
 import { ImageBackground, View } from 'react-native';
 
 import MenuButton from '../../Buttons/MenuButton';
-import convertMidi from '../../../utils/midiConverter';
+import { getLevelNotes } from '../../../utils/midiConverter';
 import styles from '../../../styles/Menu/MenuMainStyle';
+import { getToken } from '../../../networking/ServerConnector';
 
 interface Props {
   navigation: Navigation;
@@ -21,12 +22,14 @@ export default class Training extends React.Component<Props> {
         <View style={styles.container}>
           <MenuButton
             text={`Practice based on your progress`}
-            onPress={() =>
+            onPress={async () => {
+              const token = await getToken();
+              const noteSequence = await getLevelNotes(0, token);
               this.props.navigation.navigate('Level', {
                 isTraining: true,
-                noteSequence: convertMidi(song),
-              })
-            }
+                noteSequence,
+              });
+            }}
           />
         </View>
       </ImageBackground>
