@@ -249,7 +249,7 @@ class Level extends React.Component<Props, State> {
 
     this.ws.onmessage = (e: { data: string }) => {
       if (!this.state.didGameStart) {
-        this.setState({ didGameStart: true })
+        this.setState({ didGameStart: true });
         this.moveNotes();
       }
       this.simulateNoteTouch(parseInt(e.data));
