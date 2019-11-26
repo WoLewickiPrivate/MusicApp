@@ -71,17 +71,18 @@ class Level extends React.Component<Props, State> {
       duration: this.state.notes.totalDuration * 1000,
       easing: Easing.inOut(Easing.linear),
     }).start(() => {
-      clearInterval(this.intervalID);
-      this.releaseAllKeys();
+      this.longestStrike = Math.max(this.state.strike, this.longestStrike);
       if (!this.isTrainingLevel()) {
         this.addStars();
       }
+      this.cleanUp();
       this.setState({ didGameEnd: true });
     });
   }
 
   cleanUp() {
     clearInterval(this.intervalID);
+    this.resetStrike();
     this.releaseAllKeys();
     this.resetBoard();
   }
@@ -120,7 +121,7 @@ class Level extends React.Component<Props, State> {
     } else {
       if (this.state.strike > 0) {
         this.longestStrike = Math.max(this.state.strike, this.longestStrike);
-        this.setState({ strike: 0 });
+        this.resetStrike();
       }
     }
   }
@@ -171,7 +172,7 @@ class Level extends React.Component<Props, State> {
       ) {
         if (this.state.strike > 0) {
           this.longestStrike = Math.max(this.state.strike, this.longestStrike);
-          this.setState({ strike: 0 });
+          this.resetStrike();
         }
         this.noteStack.shift();
       }
@@ -236,6 +237,10 @@ class Level extends React.Component<Props, State> {
     }
   }
 
+  resetStrike() {
+    this.setState({ strike: 0 });
+  }
+
   initWebSocket() {
     this.ws.onopen = () => {
       console.warn('Socket opened');
@@ -249,6 +254,8 @@ class Level extends React.Component<Props, State> {
 
   startGame() {
     this.state.movingVal.setValue(0);
+    this.initNoteStack();
+    this.initWebSocket();
     this.initStrikeUpdater();
     this.setState({ didLevelLoad: true });
   }
@@ -258,9 +265,7 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.initWebSocket();
     this.initChangePointsMap();
-    this.initNoteStack();
     this.startGame();
   }
 
