@@ -119,6 +119,7 @@ class Level extends React.Component<Props, State> {
       });
     } else {
       if (this.state.strike > 0) {
+        this.longestStrike = Math.max(this.state.strike, this.longestStrike);
         this.setState({ strike: 0 });
       }
     }
