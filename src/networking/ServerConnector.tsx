@@ -36,7 +36,6 @@ const createSong = async (params: CreateSongParams): Promise<SequenceNote> => {
       },
     );
     if (response.status >= 400) {
-      console.warn('401');
       return require('../static/sounds/output.json');
     }
     return response as SequenceNote;
@@ -75,7 +74,7 @@ const fetchNotes = async (
   try {
     const response = await fetch(
       `https://musicapp-bck.herokuapp.com/songs/download/?song_id=${levelNumber +
-        33}`,
+      33}`,
       {
         method: 'GET',
         headers: {

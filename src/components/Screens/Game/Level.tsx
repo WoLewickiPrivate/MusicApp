@@ -57,7 +57,7 @@ class Level extends React.Component<Props, State> {
   intervalID: any = null;
   starsGained: number = 0;
   //@ts-ignore
-  ws = new WebSocket('ws://192.168.2.160:8765');
+  ws = new WebSocket('ws://192.168.2.182:8765');
   changePointsMap: Array<Array<{ start: number; end: number }>> = [];
   noteStack: Array<MidiElement> = [];
   longestStrike: number = 0;
@@ -243,11 +243,15 @@ class Level extends React.Component<Props, State> {
 
   initWebSocket() {
     this.ws.onopen = () => {
-      console.warn('Socket opened');
+      console.log('Socket opened');
       this.ws.send('something'); // send a message
     };
 
-    this.ws.onmessage = e => {
+    this.ws.onmessage = (e: { data: string }) => {
+      if (!this.state.didGameStart) {
+        this.setState({ didGameStart: true })
+        this.moveNotes();
+      }
       this.simulateNoteTouch(parseInt(e.data));
     };
   }
