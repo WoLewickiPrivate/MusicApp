@@ -49,6 +49,10 @@ export default class Brick extends Component<Props, State> {
     );
   }
 
+  componentWillUnmount() {
+    this.eventListener.remove();
+  }
+
   eventHandler = (event: any) => {
     if (event.note == this.props.midiNumber) {
       if (
@@ -58,8 +62,8 @@ export default class Brick extends Component<Props, State> {
       ) {
         this.setState({ brickState: 1 });
       }
-      if (event.type == 0) {
-        this.setState({ brickState: 0 });
+      if (event.type == -1) {
+        this.setState({ brickState: -1 });
       }
     }
   };

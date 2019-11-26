@@ -1,11 +1,12 @@
-import React, { RefObject } from 'react';
+import React from 'react';
 import {
   Animated,
   Button,
   DeviceEventEmitter,
-  StyleSheet,
-  View,
   Easing,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -15,11 +16,11 @@ import {
   calculateSongLength,
   countGainedStars,
 } from '../../../utils/notesParsing';
+import range from '../../../utils/rangeUtils';
+import MidiNumbers from '../../Piano/MidiNumbers';
 import Piano from '../../Piano/Piano';
 import Board from './Board';
 import EndGamePopup from './EndGamePopup';
-import range from '../../../utils/rangeUtils';
-import MidiNumbers from '../../Piano/MidiNumbers';
 
 interface OwnProps {
   navigation: Navigation;
@@ -35,6 +36,7 @@ interface State {
   didGameEnd: boolean;
   didGameStart: boolean;
   didLevelLoad: boolean;
+  strike: number;
 }
 
 class Level extends React.Component<Props, State> {
@@ -46,6 +48,7 @@ class Level extends React.Component<Props, State> {
     didGameEnd: false,
     didGameStart: false,
     didLevelLoad: false,
+    strike: 0,
   };
 
   brickUnitLength: number = 50;
@@ -53,20 +56,71 @@ class Level extends React.Component<Props, State> {
   lastNote: string = 'g4';
   intervalID: any = null;
   starsGained: number = 0;
+  //@ts-ignore
   ws = new WebSocket('ws://192.168.2.160:8765');
   changePointsMap: Array<Array<{ start: number; end: number }>> = [];
-  touchEvents: Array<{ note: number; index: number }> = [];
+  noteStack: Array<MidiElement> = [];
+  longestStrike: number = 0;
+
+  moveNotes() {
+    Animated.timing(this.state.movingVal, {
+      toValue: calculateSongLength(
+        this.state.notes.totalDuration,
+        this.brickUnitLength,
+      ),
+      duration: this.state.notes.totalDuration * 1000,
+      easing: Easing.inOut(Easing.linear),
+    }).start(() => {
+      clearInterval(this.intervalID);
+      this.releaseAllKeys();
+      if (!this.isTrainingLevel()) {
+        this.addStars();
+      }
+      this.setState({ didGameEnd: true });
+    });
+  }
+
+  cleanUp() {
+    clearInterval(this.intervalID);
+    this.releaseAllKeys();
+    this.resetBoard();
+  }
+
+  resetBoard() {
+    const firstMidi = MidiNumbers.fromNote(this.firstNote);
+    const lastMidi = MidiNumbers.fromNote(this.lastNote);
+    range(firstMidi, lastMidi + 1).forEach(midi => {
+      DeviceEventEmitter.emit('brickEvent', {
+        type: -1,
+        note: midi,
+        pos: 0,
+      });
+    });
+  }
 
   touchKey(note: number) {
     DeviceEventEmitter.emit('pianoEvent', { type: 1, note: note });
     console.log(this.checkAccuracy(note));
     if (this.checkAccuracy(note)) {
-      const midiIndex = Math.trunc(this.state.movingVal._value);
+      const midiIndex = this.getMidiIndex();
+      //prevent from counting strike many times on one note
+      if (
+        this.noteStack.length > 0 &&
+        this.noteStack[0].start < midiIndex &&
+        this.noteStack[0].end > midiIndex
+      ) {
+        this.noteStack.shift();
+        this.setState({ strike: this.state.strike + 1 });
+      }
       DeviceEventEmitter.emit('brickEvent', {
         type: 1,
         note: note,
         pos: midiIndex,
       });
+    } else {
+      if (this.state.strike > 0) {
+        this.setState({ strike: 0 });
+      }
     }
   }
 
@@ -81,8 +135,7 @@ class Level extends React.Component<Props, State> {
   simulateNoteTouch(note: number) {
     this.touchKey(note);
     if (this.state.didGameStart) {
-      const midiIndex = Math.trunc(this.state.movingVal._value);
-      this.touchEvents.push({ note: note, index: midiIndex });
+      const midiIndex = this.getMidiIndex();
     }
 
     setTimeout(() => this.releaseKey(note), 50);
@@ -90,22 +143,38 @@ class Level extends React.Component<Props, State> {
 
   checkAccuracy(note: number) {
     const firstMidi = MidiNumbers.fromNote(this.firstNote);
-    const midiIndex = Math.trunc(this.state.movingVal._value);
-    let closestPointIndex = this.changePointsMap[note - firstMidi].findIndex(
+    const midiIndex = this.getMidiIndex();
+    const noteIndex = Math.min(
+      note - firstMidi,
+      MidiNumbers.fromNote(this.lastNote),
+    );
+    let closestPointIndex = this.changePointsMap[noteIndex].findIndex(
       value => value.end > midiIndex,
     );
     if (closestPointIndex == -1) {
       return false;
     }
     console.log(
-      this.changePointsMap[note - firstMidi][closestPointIndex].start,
-      this.changePointsMap[note - firstMidi][closestPointIndex].end,
+      this.changePointsMap[noteIndex][closestPointIndex].start,
+      this.changePointsMap[noteIndex][closestPointIndex].end,
       midiIndex,
     );
-    return (
-      this.changePointsMap[note - firstMidi][closestPointIndex].start <
-      midiIndex
-    );
+    return this.changePointsMap[noteIndex][closestPointIndex].start < midiIndex;
+  }
+
+  initStrikeUpdater() {
+    setInterval(() => {
+      if (
+        this.noteStack.length > 0 &&
+        this.noteStack[0].end < this.getMidiIndex()
+      ) {
+        if (this.state.strike > 0) {
+          this.longestStrike = Math.max(this.state.strike, this.longestStrike);
+          this.setState({ strike: 0 });
+        }
+        this.noteStack.shift();
+      }
+    }, 10);
   }
 
   definePianoBoundaries() {
@@ -114,13 +183,21 @@ class Level extends React.Component<Props, State> {
     this.lastNote = MidiNumbers.midiToNoteName(Math.max(...onlyPitches));
   }
 
+  getMidiIndex() {
+    return Math.trunc(this.state.movingVal._value);
+  }
+
+  getPianoRangeArray(
+    firstMidi: number,
+    lastMidi: number,
+  ): Array<Array<{ start: number; end: number }>> {
+    return range(firstMidi, lastMidi + 1).map(() => []);
+  }
+
   initChangePointsMap() {
     const firstMidi = MidiNumbers.fromNote(this.firstNote);
     const lastMidi = MidiNumbers.fromNote(this.lastNote);
-    let noteMap: Array<Array<{ start: number; end: number }>> = range(
-      firstMidi,
-      lastMidi + 1,
-    ).map(() => []);
+    let noteMap = this.getPianoRangeArray(firstMidi, lastMidi);
     this.state.notes.midisArray.map(element => {
       noteMap[element.pitch - firstMidi].push({
         start: Math.trunc(element.start * this.brickUnitLength),
@@ -131,32 +208,47 @@ class Level extends React.Component<Props, State> {
     this.changePointsMap = noteMap;
   }
 
-  moveNotes() {
-    Animated.timing(this.state.movingVal, {
-      toValue: calculateSongLength(
-        this.state.notes.totalDuration,
-        this.brickUnitLength,
-      ),
-      duration: this.state.notes.totalDuration * 1000,
-      easing: Easing.inOut(Easing.linear),
-    }).start(() => {
-      clearInterval(this.intervalID);
-      this.releaseAllKeys();
-      if (!this.props.navigation.getParam('isTraining', false)) {
-        this.starsGained = countGainedStars();
-        if (this.state.levelStars < this.starsGained) {
-          this.props.addStarsToLevel({
-            levelNumber: this.props.navigation.getParam('levelNumber', 0),
-            starsGained: this.starsGained,
-          });
-        }
-      }
-      this.setState({ didGameEnd: true });
+  initNoteStack() {
+    this.noteStack = this.state.notes.midisArray.map(element => {
+      return {
+        start: Math.trunc(element.start * this.brickUnitLength),
+        end: Math.trunc(element.end * this.brickUnitLength),
+        pitch: element.pitch,
+      };
     });
+  }
+
+  isTrainingLevel() {
+    return this.props.navigation.getParam('isTraining', false);
+  }
+
+  addStars() {
+    this.starsGained = countGainedStars(
+      this.longestStrike,
+      this.state.notes.midisArray.length,
+    );
+    if (this.state.levelStars < this.starsGained) {
+      this.props.addStarsToLevel({
+        levelNumber: this.props.navigation.getParam('levelNumber', 0),
+        starsGained: this.starsGained,
+      });
+    }
+  }
+
+  initWebSocket() {
+    this.ws.onopen = () => {
+      console.warn('Socket opened');
+      this.ws.send('something'); // send a message
+    };
+
+    this.ws.onmessage = e => {
+      this.simulateNoteTouch(parseInt(e.data));
+    };
   }
 
   startGame() {
     this.state.movingVal.setValue(0);
+    this.initStrikeUpdater();
     this.setState({ didLevelLoad: true });
   }
 
@@ -165,18 +257,9 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    this.initWebSocket();
     this.initChangePointsMap();
-    console.log(this.changePointsMap);
-    this.ws.onopen = () => {
-      // connection opened
-      console.warn('Opened');
-      this.ws.send('something'); // send a message
-    };
-
-    this.ws.onmessage = e => {
-      this.simulateNoteTouch(parseInt(e.data));
-    };
-
+    this.initNoteStack();
     this.startGame();
   }
 
@@ -187,6 +270,7 @@ class Level extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
+        <Text style={styles.strike_text}>{this.state.strike}</Text>
         <EndGamePopup
           navigation={this.props.navigation}
           levelNumber={this.props.navigation.getParam('levelNumber', 0)}
@@ -232,14 +316,6 @@ class Level extends React.Component<Props, State> {
 }
 export type ReduxProps = ReturnType<typeof mapDispatchToProps>;
 
-function findClosestInArray(
-  array: Array<{ start: number; end: number }>,
-  goal: number,
-) {
-  const index = array.findIndex(value => value.start < goal);
-  return index > 0 ? index - 1 : -1;
-}
-
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     addStarsToLevel: (levelSpec: {
@@ -259,5 +335,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: 'black',
+  },
+  strike_text: {
+    zIndex: 1,
+    textShadowOffset: { width: 10, height: 10 },
+    fontWeight: 'bold',
+    fontSize: 30,
+    top: 50,
+    position: 'absolute',
+    justifyContent: 'flex-start',
+    color: 'green',
+    alignSelf: 'center',
   },
 });

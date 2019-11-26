@@ -23,8 +23,9 @@ function arraysEqual(a: any[], b: any[]) {
   return true;
 }
 
-function countGainedStars(): number {
-  const starsGained = Math.floor(Math.random() * 58) % 4;
+function countGainedStars(longestStrike: number, noteCount: number): number {
+  console.warn(longestStrike, noteCount);
+  const starsGained = Math.floor(((longestStrike / noteCount) * 10) / 3);
   return starsGained;
 }
 
