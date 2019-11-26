@@ -41,7 +41,7 @@ interface State {
 
 class Level extends React.Component<Props, State> {
   state: State = {
-    levelStars: this.props.navigation.getParam('levelStars'),
+    levelStars: this.props.navigation.getParam('levelStars', 0),
     notes: this.props.navigation.getParam('noteSequence', {}),
     noteIndex: 0,
     movingVal: new Animated.Value(0),

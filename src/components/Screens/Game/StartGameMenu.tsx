@@ -37,14 +37,23 @@ class StartGameMenu extends React.Component<Props, State> {
     token: '',
   };
 
+  static getDerivedStateFromProps(props: Props, state: any) {
+    const levels = StartGameMenu.makeLevels(props.levelStars);
+    if (levels !== state.levels) {
+      return {
+        levels,
+      };
+    }
+    return null;
+  }
+
   async goToLevel(levelNumber: number, levelStars: number) {
     const noteSequence = await getLevelNotes(
       levelNumber,
+      this.state.token,
       this.props.levelNotes,
       this.props.addNotes,
-      this.state.token,
     );
-    console.warn(noteSequence);
     this.props.navigation.navigate('Level', {
       levelStars,
       levelNumber,
@@ -52,7 +61,7 @@ class StartGameMenu extends React.Component<Props, State> {
     });
   }
 
-  makeLevels(levelStars: number[]): Level[] {
+  static makeLevels(levelStars: number[]): Level[] {
     const levels: Level[] = [];
     // add levelStars to Reducer after adding level, there will be dispatch method to make it work somehow
     for (let i = 1; i < levelStars.length; i++) {
@@ -66,13 +75,7 @@ class StartGameMenu extends React.Component<Props, State> {
   }
 
   async click() {
-    const rest = await getLevelNotes(
-      10,
-      this.props.levelNotes,
-      this.props.addNotes,
-      this.state.token,
-    );
-    console.warn(rest);
+    const rest = await getLevelNotes(10, this.state.token);
   }
 
   renderLevelButtons() {
@@ -93,7 +96,7 @@ class StartGameMenu extends React.Component<Props, State> {
 
   async componentDidMount() {
     const token = await getToken();
-    const levels = this.makeLevels(this.props.levelStars);
+    const levels = StartGameMenu.makeLevels(this.props.levelStars);
     this.setState({
       levels,
       stars: this.props.levelStars.reduce(this.sumElems, 0),

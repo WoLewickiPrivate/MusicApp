@@ -1,4 +1,8 @@
-import { fetchNotes } from '../networking/ServerConnector';
+import {
+  fetchNotes,
+  CreateSongParams,
+  createSong,
+} from '../networking/ServerConnector';
 
 export interface Sequence {
   totalDuration: number;
@@ -12,16 +16,27 @@ interface NotesSpec {
 
 export async function getLevelNotes(
   levelNumber: number,
-  levelNotes: Array<SequenceNote | null>,
-  addNotesToLevel: (notesSpec: NotesSpec) => void,
   token: string,
+  levelNotes?: Array<SequenceNote | null>,
+  addNotesToLevel?: (notesSpec: NotesSpec) => void,
 ): Promise<Sequence> {
   try {
-    let noteSequence = levelNotes[levelNumber];
-    if (!noteSequence) {
-      noteSequence = await fetchNotes(levelNumber, token);
-      // console.warn(noteSequence);
-      // addNotesToLevel({ levelNumber, noteSequence });
+    let noteSequence;
+    if (levelNotes && levelNumber > 0) {
+      noteSequence = levelNotes[levelNumber];
+      if (!noteSequence) {
+        noteSequence = await fetchNotes(levelNumber, token);
+        // console.warn(noteSequence);
+        // addNotesToLevel({ levelNumber, noteSequence });
+      }
+    } else {
+      const params: CreateSongParams = {
+        id: '42',
+        startTime: '4.2',
+        stopTime: '33',
+        token,
+      };
+      noteSequence = await createSong(params);
     }
     const totalDuration = noteSequence.total_time ? noteSequence.total_time : 0;
     const notesArray = noteSequence.notes ? noteSequence.notes : [];

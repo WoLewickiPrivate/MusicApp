@@ -26,7 +26,7 @@ const getSong = async (endpoint: string): Promise<SequenceNote> => {
 const createSong = async (params: CreateSongParams): Promise<SequenceNote> => {
   try {
     const response = await fetch(
-      `https://musicapp-bck.herokuapp.com/songs/create_song?song_id=1&start_time=4.2&stop_time=33/`,
+      `https://musicapp-bck.herokuapp.com/songs/create_song?song_id=${params.id}&start_time=${params.startTime}&stop_time=${params.stopTime}/`,
       {
         method: 'GET',
         headers: {
@@ -35,9 +35,13 @@ const createSong = async (params: CreateSongParams): Promise<SequenceNote> => {
         },
       },
     );
+    if (response.status >= 400) {
+      console.warn('401');
+      return require('../static/sounds/output.json');
+    }
     return response as SequenceNote;
   } catch (error) {
-    throw Error(error);
+    return require('../static/sounds/output.json');
   }
 };
 
@@ -60,7 +64,7 @@ const getToken = async (): Promise<string> => {
     const responseBody = await response.json();
     return responseBody['token'];
   } catch (error) {
-    throw Error(error);
+    throw new Error(error);
   }
 };
 
@@ -70,7 +74,8 @@ const fetchNotes = async (
 ): Promise<SequenceNote> => {
   try {
     const response = await fetch(
-      `https://musicapp-bck.herokuapp.com/songs/download/?song_id=40`,
+      `https://musicapp-bck.herokuapp.com/songs/download/?song_id=${levelNumber +
+        33}`,
       {
         method: 'GET',
         headers: {
