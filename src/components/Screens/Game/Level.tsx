@@ -56,8 +56,7 @@ class Level extends React.Component<Props, State> {
   intervalID: any = null;
   starsGained: number = 0;
   //@ts-ignore
-  ws = new WebSocket('ws://192.168.2.160:8765');
-  changePointsMap: Array<Array<{ start: number; end: number }>> = [];
+  ws = new WebSocket('ws://192.168.1.13:8765');
   noteStack: Array<MidiElement> = [];
   longestStrike: number = 0;
   strike: number = 0;
@@ -101,29 +100,38 @@ class Level extends React.Component<Props, State> {
 
   touchKey(note: number) {
     DeviceEventEmitter.emit('pianoEvent', { type: 1, note: note });
-    console.log(this.checkAccuracy(note));
-    if (this.checkAccuracy(note)) {
-      const midiIndex = this.getMidiIndex();
-      //prevent from counting strike many times on one note
-      if (
-        this.noteStack.length > 0 &&
-        this.noteStack[0].start < midiIndex &&
-        this.noteStack[0].end > midiIndex
-      ) {
+    const midiIndex = this.getMidiIndex();
+    let i = 0;
+    while (
+      i < this.noteStack.length &&
+      this.noteStack[i].start < midiIndex &&
+      this.noteStack[i].end > midiIndex
+    ) {
+      let currentNote = this.noteStack[i];
+      if (currentNote.pitch == note) {
+        if (i != 0) {
+          [this.noteStack[0], this.noteStack[i]] = [
+            this.noteStack[i],
+            this.noteStack[0],
+          ];
+        }
         this.noteStack.shift();
         this.strike += 1;
         this.updateStrike();
+
+        DeviceEventEmitter.emit('brickEvent', {
+          type: 1,
+          note: note,
+          pos: midiIndex,
+        });
+
+        return;
       }
-      DeviceEventEmitter.emit('brickEvent', {
-        type: 1,
-        note: note,
-        pos: midiIndex,
-      });
-    } else {
-      if (this.strike > 0) {
-        this.longestStrike = Math.max(this.strike, this.longestStrike);
-        this.resetStrike();
-      }
+      i++;
+    }
+
+    if (this.strike > 0) {
+      this.resetStrike();
     }
   }
 
@@ -137,32 +145,8 @@ class Level extends React.Component<Props, State> {
 
   simulateNoteTouch(note: number) {
     this.touchKey(note);
-    if (this.state.didGameStart) {
-      const midiIndex = this.getMidiIndex();
-    }
 
     setTimeout(() => this.releaseKey(note), 50);
-  }
-
-  checkAccuracy(note: number) {
-    const firstMidi = MidiNumbers.fromNote(this.firstNote);
-    const midiIndex = this.getMidiIndex();
-    const noteIndex = Math.min(
-      note - firstMidi,
-      MidiNumbers.fromNote(this.lastNote),
-    );
-    let closestPointIndex = this.changePointsMap[noteIndex].findIndex(
-      value => value.end > midiIndex,
-    );
-    if (closestPointIndex == -1) {
-      return false;
-    }
-    console.log(
-      this.changePointsMap[noteIndex][closestPointIndex].start,
-      this.changePointsMap[noteIndex][closestPointIndex].end,
-      midiIndex,
-    );
-    return this.changePointsMap[noteIndex][closestPointIndex].start < midiIndex;
   }
 
   initStrikeUpdater() {
@@ -194,20 +178,6 @@ class Level extends React.Component<Props, State> {
     return range(firstMidi, lastMidi + 1).map(() => []);
   }
 
-  initChangePointsMap() {
-    const firstMidi = MidiNumbers.fromNote(this.firstNote);
-    const lastMidi = MidiNumbers.fromNote(this.lastNote);
-    let noteMap = this.getPianoRangeArray(firstMidi, lastMidi);
-    this.state.notes.midisArray.map(element => {
-      noteMap[element.pitch - firstMidi].push({
-        start: Math.trunc(element.start * this.brickUnitLength),
-        end: Math.trunc(element.end * this.brickUnitLength),
-      });
-    });
-
-    this.changePointsMap = noteMap;
-  }
-
   initNoteStack() {
     this.noteStack = this.state.notes.midisArray.map(element => {
       return {
@@ -236,6 +206,7 @@ class Level extends React.Component<Props, State> {
   }
 
   resetStrike() {
+    this.longestStrike = Math.max(this.strike, this.longestStrike);
     this.strike = 0;
     this.updateStrike();
   }
@@ -268,7 +239,6 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.initChangePointsMap();
     this.startGame();
   }
 
