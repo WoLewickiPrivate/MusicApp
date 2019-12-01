@@ -14,12 +14,15 @@ import {
 import Vex from 'vexflow';
 import MidiNumbers from '../../Piano/MidiNumbers';
 const { width, height } = Dimensions.get('window');
+const VF = Vex.Flow;
+const MAX_STAVE = 10;
 
 interface State {
   currentNote: string;
   randomNotes: Array<string>;
   guessed: boolean;
   score: number;
+  staveNotes: Array<any>;
 }
 
 export default class Tutorial extends React.Component<State> {
@@ -28,6 +31,7 @@ export default class Tutorial extends React.Component<State> {
     randomNotes: [],
     guessed: false,
     score: 0,
+    staveNotes: [],
   };
 
   generateRandomNotes() {
@@ -51,8 +55,7 @@ export default class Tutorial extends React.Component<State> {
     return randomNotes[randomIndex];
   }
 
-  getParsedNoteString() {
-    let note = this.state.currentNote;
+  getParsedNoteString(note: string) {
     let bareNote = note.slice(0, note.length - 1);
     let octave = note[note.length - 1];
 
@@ -86,13 +89,26 @@ export default class Tutorial extends React.Component<State> {
     });
   }
 
+  getStaveNote(note: string) {
+    return note.includes('#')
+      ? new VF.StaveNote({
+          clef: 'treble',
+          keys: [note],
+          duration: 'q',
+        }).addAccidental(0, new VF.Accidental('#'))
+      : new VF.StaveNote({
+          clef: 'treble',
+          keys: [note],
+          duration: 'q',
+        });
+  }
+
   guessNote(note: string) {
+    let isCorrect = note == this.state.currentNote;
     this.setState({
       guessed: true,
-      score:
-        note == this.state.currentNote
-          ? this.state.score + 1
-          : this.state.score,
+      score: isCorrect ? this.state.score + 1 : this.state.score,
+      staveNotes: isCorrect ? this.state.staveNotes : [],
     });
     setTimeout(() => this.resetQuiz(), 1000);
   }
@@ -100,10 +116,16 @@ export default class Tutorial extends React.Component<State> {
   resetQuiz() {
     let randomNotes = this.generateRandomNotes();
     let randomNote = this.pickRandomNote(randomNotes);
+    let newStave = this.getStaveNote(this.getParsedNoteString(randomNote));
+    let staveNotes =
+      this.state.staveNotes.length == MAX_STAVE
+        ? this.state.staveNotes.slice(1)
+        : this.state.staveNotes;
     this.setState({
       randomNotes: randomNotes,
       currentNote: randomNote,
       guessed: false,
+      staveNotes: [...staveNotes, newStave],
     });
   }
 
@@ -113,32 +135,23 @@ export default class Tutorial extends React.Component<State> {
 
   render() {
     const context = new ReactNativeSVGContext(NotoFontPack, {
-      width: width,
+      width: width - 10,
       height: 400,
     });
 
-    const VF = Vex.Flow;
-    var stave = new VF.Stave(0, height / 2 - 200, width);
+    var stave = new VF.Stave(0, height / 2 - 200, width - 10);
     stave.addClef('treble');
     stave.setContext(context).draw();
-    let staveNote = this.state.currentNote.includes('#')
-      ? new VF.StaveNote({
-          clef: 'treble',
-          keys: [this.getParsedNoteString()],
-          duration: 'q',
-        }).addAccidental(0, new VF.Accidental('#'))
-      : new VF.StaveNote({
-          clef: 'treble',
-          keys: [this.getParsedNoteString()],
-          duration: 'q',
-        });
-    var notes = [staveNote];
+    var notes = [...this.state.staveNotes];
 
-    var voice = new VF.Voice({ num_beats: 1, beat_value: 4 });
+    var voice = new VF.Voice({
+      num_beats: this.state.staveNotes.length,
+      beat_value: 4,
+    });
     voice.addTickables(notes);
     var formatter = new VF.Formatter()
       .joinVoices([voice])
-      .format([voice], width / 2);
+      .format([voice], width - 50);
     voice.draw(context, stave);
 
     return (
