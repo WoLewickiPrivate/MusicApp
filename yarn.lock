@@ -7459,6 +7459,11 @@ react-native-branch@~3.0.1:
   resolved "https://registry.yarnpkg.com/react-native-branch/-/react-native-branch-3.0.1.tgz#5b07b61cbd290168cd3c3662e017ebe0f356d2ca"
   integrity sha512-vbcYxPZlpF5f39GAEUF8kuGQqCNeD3E6zEdvtOq8oCGZunHXlWlKgAS6dgBKCvsHvXgHuMtpvs39VgOp8DaKig==
 
+react-native-button-group@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-button-group/-/react-native-button-group-1.0.0.tgz#2dc4683f28e05a109a7a4d7996b37b6c35a44f3c"
+  integrity sha512-aHS3GFP9idx7Z6osMWJMCRAfespqBfZzr3Stt+06FoquLtYsVe/RjRJLiPG0TTX7JpfK0ydgz32MsEbbU30mIw==
+
 react-native-fs@^2.14.1:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.14.1.tgz#61c70a865b5b5bcb020dd4e4befd60a2c20c836f"
@@ -7507,10 +7512,10 @@ react-native-safe-area-view@^0.14.1:
   dependencies:
     debounce "^1.2.0"
 
-react-native-svg@~9.9.2:
-  version "9.9.9"
-  resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-9.9.9.tgz#67c83b56d7a292162762a6d389dc78512558c2ca"
-  integrity sha512-a/wxzEaAqWZ3uYwTJKo8sj2gURmEs4xBB83tx5gK9rpoEixzHfsj8+qLacwmQrHab7nf+tWj56INMTSPqm60oA==
+react-native-svg@9.9.2:
+  version "9.9.2"
+  resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-9.9.2.tgz#33085e2b6da7a540311f5a39acb0a1366d3ee020"
+  integrity sha512-vA1m7FjqUJd+tjrwt0qIFunfbGMUqc+l7RP4ZNGsYxrJDXJnVA/8CAwsFvxOxtNI/V4xk+Fhv+I3Gd12CWIt/A==
 
 react-native-view-shot@2.6.0:
   version "2.6.0"
