@@ -3,24 +3,28 @@ import React from 'react';
 import { DeviceEventEmitter, StyleSheet, Text } from 'react-native';
 
 interface State {
+  eventListener?: EventSubscription;
   strike: number;
 }
 
-export default class StrikeDisplayer extends React.Component<State> {
+interface Props {}
+
+export default class StrikeDisplayer extends React.Component<Props, State> {
   state: State = {
     strike: 0,
   };
-  eventListener: EventSubscription = null;
 
   componentDidMount() {
-    this.eventListener = DeviceEventEmitter.addListener(
-      'strikeUpdateEvent',
-      this.eventHandler,
-    );
+    this.setState({
+      eventListener: DeviceEventEmitter.addListener(
+        'strikeUpdateEvent',
+        this.eventHandler,
+      ),
+    });
   }
 
   componentWillUnmount() {
-    this.eventListener.remove();
+    this.state.eventListener!.remove();
   }
 
   eventHandler = (event: any) => {

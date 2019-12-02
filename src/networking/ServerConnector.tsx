@@ -1,3 +1,5 @@
+import { Credentials } from '../redux/CredentialsReducer';
+
 export interface CreateSongParams {
   id: string;
   startTime: string;
@@ -44,7 +46,7 @@ const createSong = async (params: CreateSongParams): Promise<SequenceNote> => {
   }
 };
 
-const getToken = async (): Promise<string> => {
+const getToken = async (credentials: Credentials): Promise<string> => {
   try {
     const response = await fetch(
       `https://musicapp-bck.herokuapp.com/auth/token/`,
@@ -55,8 +57,8 @@ const getToken = async (): Promise<string> => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: 'wojtek',
-          password: 'wlewicki123',
+          username: credentials.login,
+          password: credentials.password,
         }),
       },
     );
@@ -74,7 +76,7 @@ const fetchNotes = async (
   try {
     const response = await fetch(
       `https://musicapp-bck.herokuapp.com/songs/download/?song_id=${levelNumber +
-      33}`,
+        33}`,
       {
         method: 'GET',
         headers: {
@@ -94,4 +96,63 @@ const fetchNotes = async (
   }
 };
 
-export { getSong, getToken, createSong, fetchNotes };
+const tryLogin = async (login: string, password: string): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `https://musicapp-bck.herokuapp.com/auth/token/`,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: login,
+          password: password,
+        }),
+      },
+    );
+    if (response.status >= 400) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const tryRegister = async (
+  login: string,
+  password: string,
+  email: string,
+  firstName: string,
+  lastName: string,
+): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `https://musicapp-bck.herokuapp.com/auth/register/`,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: login,
+          password,
+          email,
+          first_name: firstName,
+          last_name: lastName,
+        }),
+      },
+    );
+    if (response.status >= 400) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+export { getSong, getToken, createSong, fetchNotes, tryLogin, tryRegister };

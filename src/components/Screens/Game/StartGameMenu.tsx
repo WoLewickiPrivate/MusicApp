@@ -95,7 +95,7 @@ class StartGameMenu extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    const token = await getToken();
+    const token = await getToken(this.props.credentials);
     const levels = StartGameMenu.makeLevels(this.props.levelStars);
     this.setState({
       levels,
@@ -128,6 +128,7 @@ type ReduxProps = ReturnType<typeof mapStateToProps> &
 
 const mapStateToProps = (state: RootReducerState) => {
   return {
+    credentials: state.credentials.credentials,
     levelStars: state.levelStars.levelStarsCount,
     levelNotes: state.levelNotes.levelNotes,
   };
