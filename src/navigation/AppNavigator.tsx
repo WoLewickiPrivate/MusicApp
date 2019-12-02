@@ -45,7 +45,7 @@ const profileImage = <CountContainer />;
 
 const navOptions = {
   headerStyle: {
-    backgroundColor: 'grey',
+    backgroundColor: 'powderblue',
   },
   headerTitle: profileImage,
   headerTintColor: '#fff',
