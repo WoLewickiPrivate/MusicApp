@@ -22,7 +22,6 @@ class AuthLoadingScreen extends React.Component<Props> {
     }
   };
 
-  // Render any loading content that you like here
   render() {
     return (
       <View>

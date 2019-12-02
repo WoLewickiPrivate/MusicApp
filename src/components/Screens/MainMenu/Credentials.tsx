@@ -49,7 +49,6 @@ class Creds extends React.Component<Props, State> {
 
   backgroundImage: any;
   componentWillMount() {
-    console.warn(this.state.login, this.state.password);
     this.backgroundImage = require('../../../static/backgroundImages/pianoMain.jpg');
   }
   render() {

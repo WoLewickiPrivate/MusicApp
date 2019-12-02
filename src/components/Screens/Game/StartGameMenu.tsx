@@ -52,7 +52,6 @@ class StartGameMenu extends React.Component<Props, State> {
       levelNumber,
       this.state.token,
       this.props.levelNotes,
-      this.props.addNotes,
     );
     this.props.navigation.navigate('Level', {
       levelStars,
@@ -72,10 +71,6 @@ class StartGameMenu extends React.Component<Props, State> {
       });
     }
     return levels;
-  }
-
-  async click() {
-    const rest = await getLevelNotes(10, this.state.token);
   }
 
   renderLevelButtons() {
@@ -114,7 +109,6 @@ class StartGameMenu extends React.Component<Props, State> {
         source={require('../../../static/backgroundImages/pianoMain.jpg')}
         style={{ width: '100%', height: '100%' }}
       >
-        <Button title="click" onPress={async () => this.click()} />
         <ScrollView>
           <View style={styles.container}>{this.renderLevelButtons()}</View>
         </ScrollView>

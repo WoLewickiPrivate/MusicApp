@@ -18,7 +18,6 @@ export async function getLevelNotes(
   levelNumber: number,
   token: string,
   levelNotes?: Array<SequenceNote | null>,
-  addNotesToLevel?: (notesSpec: NotesSpec) => void,
 ): Promise<Sequence> {
   try {
     let noteSequence;
@@ -26,8 +25,6 @@ export async function getLevelNotes(
       noteSequence = levelNotes[levelNumber];
       if (!noteSequence) {
         noteSequence = await fetchNotes(levelNumber, token);
-        // console.warn(noteSequence);
-        // addNotesToLevel({ levelNumber, noteSequence });
       }
     } else {
       const params: CreateSongParams = {
