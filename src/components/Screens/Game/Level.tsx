@@ -22,6 +22,7 @@ import Piano from '../../Piano/Piano';
 import Board from './Board';
 import EndGamePopup from './EndGamePopup';
 import StrikeDisplayer from './StrikeDisplayer';
+import { LevelStars } from '../../../utils/levelMappings';
 
 interface OwnProps {
   navigation: Navigation;
@@ -200,8 +201,8 @@ class Level extends React.Component<Props, State> {
     );
     if (this.state.levelStars < this.starsGained) {
       this.props.addStarsToLevel({
-        levelNumber: this.props.navigation.getParam('levelNumber', 0),
-        starsGained: this.starsGained,
+        song_id: this.props.navigation.getParam('levelNumber'),
+        high_score: this.starsGained,
       });
     }
   }
@@ -302,10 +303,8 @@ export type ReduxProps = ReturnType<typeof mapDispatchToProps>;
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    addStarsToLevel: (levelSpec: {
-      levelNumber: number;
-      starsGained: number;
-    }) => dispatch(addStarsToLevel(levelSpec)),
+    addStarsToLevel: (levelStars: LevelStars) =>
+      dispatch(addStarsToLevel(levelStars)),
   };
 }
 

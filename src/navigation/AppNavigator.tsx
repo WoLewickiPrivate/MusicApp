@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 
 import Level from '../components/Screens/Game/Level';
 import StartGameMenu from '../components/Screens/Game/StartGameMenu';
+import GameDifficultyMenu from '../components/Screens/MainMenu/GameDifficulty';
 import Credentials from '../components/Screens/MainMenu/Credentials';
 import Register from '../components/Screens/MainMenu/Register';
 import MenuScreen from '../components/Screens/MainMenu/MenuScreen';
@@ -16,16 +17,17 @@ import TutorialMenu from '../components/Screens/Tutorial/TutorialMenu';
 import LoginScreen from '../components/Screens/MainMenu/LoginScreen';
 import AuthLoadingScreen from '../components/Screens/MainMenu/AuthLoading';
 import { RootReducerState } from '../redux/RootReducer';
+import { LevelStars } from '../utils/levelMappings';
 
-interface Props {
-  levelStars: number[];
+interface ReduxProps {
+  levelStars: LevelStars[];
 }
 
-function sumElems(total: number, current: number) {
-  return total + current;
+function sumElems(total: number, current: LevelStars) {
+  return total + current.high_score;
 }
 
-class Count extends React.Component<Props> {
+class Count extends React.Component<ReduxProps> {
   render() {
     return (
       <View style={{ flexDirection: 'row' }}>
@@ -42,7 +44,7 @@ class Count extends React.Component<Props> {
 }
 
 let CountContainer = connect((state: RootReducerState) => ({
-  levelStars: state.levelStars.levelStarsCount,
+  levelStars: state.levelStars.levelStars,
 }))(Count);
 
 const profileImage = <CountContainer />;
@@ -70,7 +72,7 @@ const MainStackNavigator = createStackNavigator(
   {
     Menu: { screen: MenuScreen },
     Settings: { screen: Settings },
-
+    GameDifficultyMenu: { screen: GameDifficultyMenu },
     TutorialMenu: { screen: TutorialMenu },
     Tutorial: { screen: Tutorial },
     StartGameMenu: { screen: StartGameMenu },

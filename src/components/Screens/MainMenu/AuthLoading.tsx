@@ -1,7 +1,17 @@
 import React from 'react';
 import { ActivityIndicator, StatusBar, View } from 'react-native';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
+
 import { RootReducerState } from '../../../redux/RootReducer';
+import {
+  prepareLevels,
+  LevelInfo,
+  LevelStars,
+} from '../../../utils/levelMappings';
+import { getToken } from '../../../networking/ServerConnector';
+import { addLevelInfo, clearLevelInfo } from '../../../redux/LevelInfosActions';
+import { addStarsToLevel, clearStars } from '../../../redux/LevelStarsActions';
 
 interface OwnProps {
   navigation: Navigation;
@@ -10,12 +20,20 @@ interface OwnProps {
 type Props = OwnProps & ReduxProps;
 
 class AuthLoadingScreen extends React.Component<Props> {
-  componentDidMount() {
-    this.tryLogin();
+  async componentDidMount() {
+    await this.tryLogin();
   }
 
-  tryLogin = () => {
+  tryLogin = async () => {
     if (this.props.credentials.login && this.props.credentials.password) {
+      const token = await getToken(this.props.credentials);
+      await prepareLevels(
+        token,
+        this.props.clearLevels,
+        this.props.clearStars,
+        this.props.addLevelInfo,
+        this.props.addLevelStars,
+      );
       this.props.navigation.navigate('Main');
     } else {
       this.props.navigation.navigate('Auth');
@@ -32,7 +50,8 @@ class AuthLoadingScreen extends React.Component<Props> {
   }
 }
 
-type ReduxProps = ReturnType<typeof mapStateToProps>;
+type ReduxProps = ReturnType<typeof mapStateToProps> &
+  ReturnType<typeof mapDispatchToProps>;
 
 const mapStateToProps = (state: RootReducerState) => {
   return {
@@ -40,7 +59,17 @@ const mapStateToProps = (state: RootReducerState) => {
   };
 };
 
+const mapDispatchToProps = (dispatch: Dispatch) => {
+  return {
+    addLevelInfo: (levelInfo: LevelInfo) => dispatch(addLevelInfo(levelInfo)),
+    addLevelStars: (levelStars: LevelStars) =>
+      dispatch(addStarsToLevel(levelStars)),
+    clearLevels: () => dispatch(clearLevelInfo()),
+    clearStars: () => dispatch(clearStars()),
+  };
+};
+
 export default connect(
   mapStateToProps,
-  null,
+  mapDispatchToProps,
 )(AuthLoadingScreen);

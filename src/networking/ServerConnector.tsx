@@ -36,6 +36,7 @@ const createSong = async (params: CreateSongParams): Promise<SequenceNote> => {
         },
       },
     );
+    console.warn(response);
     if (response.status >= 400) {
       return require('../static/sounds/output.json');
     }
@@ -71,7 +72,7 @@ const fetchNotes = async (
 ): Promise<SequenceNote> => {
   try {
     const response = await fetch(
-      `${serverApi}songs/download/?song_id=${levelNumber + 33}`,
+      `${serverApi}songs/download/?song_id=${levelNumber}`,
       {
         method: 'GET',
         headers: {
@@ -91,7 +92,10 @@ const fetchNotes = async (
   }
 };
 
-const tryLogin = async (login: string, password: string): Promise<boolean> => {
+const tryLogin = async (
+  login: string,
+  password: string,
+): Promise<{ didSuccess: boolean; token: string }> => {
   try {
     const response = await fetch(`${serverApi}auth/token/`, {
       method: 'POST',
@@ -105,11 +109,21 @@ const tryLogin = async (login: string, password: string): Promise<boolean> => {
       }),
     });
     if (response.status >= 400) {
-      return false;
+      return {
+        didSuccess: false,
+        token: '',
+      };
     }
-    return true;
+    const responseBody = await response.json();
+    return {
+      didSuccess: true,
+      token: responseBody['token'],
+    };
   } catch (error) {
-    return false;
+    return {
+      didSuccess: false,
+      token: '',
+    };
   }
 };
 
@@ -144,4 +158,51 @@ const tryRegister = async (
   }
 };
 
-export { getSong, getToken, createSong, fetchNotes, tryLogin, tryRegister };
+const fetchLevels = async (token: string) => {
+  try {
+    const response = await fetch(`${serverApi}songs/`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.status >= 400) {
+      return [];
+    }
+    return response.json();
+  } catch (error) {
+    return [];
+  }
+};
+
+const fetchUserStars = async (token: string) => {
+  try {
+    const response = await fetch(`${serverApi}songstats/all_songs/`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.status >= 400) {
+      return [];
+    }
+    return response.json();
+  } catch (error) {
+    return [];
+  }
+};
+
+export {
+  getSong,
+  getToken,
+  createSong,
+  fetchNotes,
+  tryLogin,
+  tryRegister,
+  fetchLevels,
+  fetchUserStars,
+};

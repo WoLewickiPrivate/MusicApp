@@ -3,9 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 
 interface Props {
   onPress: () => void;
-  disabled: boolean;
   stars: number;
-  levelNumber: number;
   name: string;
 }
 
@@ -23,22 +21,8 @@ export default class LevelButton extends React.Component<Props> {
   }
   render() {
     return (
-      <TouchableOpacity
-        disabled={this.props.disabled}
-        style={
-          this.props.disabled ? styles.disabledButton : styles.enabledButton
-        }
-        onPress={this.props.onPress}
-      >
-        <Text
-          style={
-            this.props.disabled
-              ? styles.disabledButtonText
-              : styles.enabledButtonText
-          }
-        >
-          {this.props.levelNumber}: {this.props.name}
-        </Text>
+      <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
+        <Text style={styles.buttonText}>{this.props.name}</Text>
         {this.renderLevelStars()}
       </TouchableOpacity>
     );
@@ -46,7 +30,7 @@ export default class LevelButton extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  enabledButton: {
+  button: {
     width: 300,
     backgroundColor: 'powderblue',
     borderRadius: 25,
@@ -55,25 +39,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  disabledButton: {
-    width: 300,
-    backgroundColor: 'grey',
-    borderRadius: 25,
-    paddingVertical: 13,
-    marginVertical: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  enabledButtonText: {
+  buttonText: {
     fontSize: 16,
     fontWeight: '500',
     color: '#ffffff',
-    textAlign: 'center',
-  },
-  disabledButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: 'black',
     textAlign: 'center',
   },
 });

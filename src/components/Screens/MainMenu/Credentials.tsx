@@ -10,6 +10,13 @@ import MenuButton from '../../Buttons/MenuButton';
 import { TextInput } from 'react-native-gesture-handler';
 import { tryLogin } from '../../../networking/ServerConnector';
 import { changeCredentials } from '../../../redux/CredentialsActions';
+import {
+  prepareLevels,
+  LevelInfo,
+  LevelStars,
+} from '../../../utils/levelMappings';
+import { addLevelInfo, clearLevelInfo } from '../../../redux/LevelInfosActions';
+import { addStarsToLevel, clearStars } from '../../../redux/LevelStarsActions';
 
 interface OwnProps {
   navigation: Navigation;
@@ -35,12 +42,22 @@ class Creds extends React.Component<Props, State> {
 
   login = async () => {
     const { navigate } = this.props.navigation;
-    const didLogin = await tryLogin(this.state.login, this.state.password);
-    if (didLogin) {
+    const { didSuccess, token } = await tryLogin(
+      this.state.login,
+      this.state.password,
+    );
+    if (didSuccess) {
       this.props.saveCredentials({
         login: this.state.login,
         password: this.state.password,
       });
+      await prepareLevels(
+        token,
+        this.props.clearLevels,
+        this.props.clearStars,
+        this.props.addLevelInfo,
+        this.props.addLevelStars,
+      );
       navigate('Main');
     } else {
       this.setState({ text: 'Wrong credentials passed!' });
@@ -98,6 +115,11 @@ type ReduxProps = ReturnType<typeof mapDispatchToProps>;
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
+    addLevelInfo: (levelInfo: LevelInfo) => dispatch(addLevelInfo(levelInfo)),
+    addLevelStars: (levelStars: LevelStars) =>
+      dispatch(addStarsToLevel(levelStars)),
+    clearLevels: () => dispatch(clearLevelInfo()),
+    clearStars: () => dispatch(clearStars()),
     saveCredentials: (credentials: Credentials) =>
       dispatch(changeCredentials(credentials)),
   };
