@@ -56,7 +56,7 @@ class Level extends React.Component<Props, State> {
   intervalID: any = null;
   starsGained: number = 0;
   //@ts-ignore
-  ws = new WebSocket('ws://192.168.2.182:8765');
+  ws = new WebSocket('ws://192.168.1.13:8765');
   changePointsMap: Array<Array<{ start: number; end: number }>> = [];
   noteStack: Array<MidiElement> = [];
   longestStrike: number = 0;
