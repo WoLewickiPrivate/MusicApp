@@ -10,7 +10,7 @@ import {
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { addStarsToLevel } from '../../../redux/LevelStarsActions';
-import { Sequence } from '../../../utils/midiConverter';
+import { Sequence, getLevelNotes } from '../../../utils/midiConverter';
 import {
   calculateSongLength,
   countGainedStars,
@@ -22,7 +22,10 @@ import Board from './Board';
 import EndGamePopup from './EndGamePopup';
 import StrikeDisplayer from './StrikeDisplayer';
 import { LevelStars } from '../../../utils/levelMappings';
-import { sendLevelStatistics } from '../../../networking/ServerConnector';
+import {
+  sendLevelStatistics,
+  createSong,
+} from '../../../networking/ServerConnector';
 
 interface OwnProps {
   navigation: Navigation;
@@ -234,7 +237,6 @@ class Level extends React.Component<Props, State> {
     this.initNoteStack();
     this.initWebSocket();
     this.initStrikeUpdater();
-    this.setState({ didLevelLoad: true });
   }
 
   componentWillMount() {
@@ -243,7 +245,7 @@ class Level extends React.Component<Props, State> {
 
   componentDidMount() {
     this.timestamp = new Date().getMinutes();
-    this.startGame();
+    // this.startGame();
   }
 
   async componentWillUnmount() {
@@ -286,18 +288,29 @@ class Level extends React.Component<Props, State> {
             this.setState({ didGameEnd: false, didGameStart: false });
             this.props.navigation.goBack();
           }}
-          doTraining={() => {
-            // TODO fetch new song
-            this.setState({ didGameEnd: false, didGameStart: false });
+          doTraining={async () => {
+            const noteSequence = await createSong({
+              id: this.props.navigation.getParam('levelNumber'),
+              startTime: '5.2',
+              stopTime: '12.3',
+              token: this.state.token,
+            });
+            const newNotes = getLevelNotes(noteSequence);
             this.isTraining = true;
+            this.setState({
+              notes: newNotes,
+              didGameEnd: false,
+              didGameStart: false,
+            });
             this.startGame();
           }}
         />
 
-        {!this.state.didGameStart && this.state.didLevelLoad && (
+        {!this.state.didGameStart && (
           <Button
             title="Press any midi key to start"
             onPress={() => {
+              this.startGame();
               this.setState({ didGameStart: true });
               this.moveNotes();
             }}
