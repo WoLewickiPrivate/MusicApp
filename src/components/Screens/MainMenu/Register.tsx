@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ImageBackground, Text } from 'react-native';
+import { View, ImageBackground, Alert } from 'react-native';
 
 import styles from '../../../styles/Menu/MenuMainStyle';
 
@@ -17,7 +17,6 @@ interface State {
   firstName: string;
   lastName: string;
   password: string;
-  text: string;
 }
 
 export default class Register extends React.Component<Props, State> {
@@ -48,7 +47,7 @@ export default class Register extends React.Component<Props, State> {
     if (didRegister) {
       navigate('Login');
     } else {
-      this.setState({ text: 'Login already used!' });
+      Alert.alert('Something went wrong!', 'Login already used!');
     }
   };
 
@@ -64,7 +63,6 @@ export default class Register extends React.Component<Props, State> {
         style={{ width: '100%', height: '100%' }}
       >
         <View style={styles.container}>
-          <Text>{this.state.text}</Text>
           <TextInput
             style={{
               height: 40,

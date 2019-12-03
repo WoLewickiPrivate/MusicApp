@@ -34,6 +34,7 @@ export const levelInfosReducer = (
     }
     case LevelMappingsActions.CLEAR_LEVEL_INFO: {
       return {
+        ...state,
         levelInfos: INITIAL_LEVEL_INFOS_STATE.levelInfos,
       };
     }

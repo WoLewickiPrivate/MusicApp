@@ -32,11 +32,13 @@ export const levelStarsReducer = (
         newArray.push(action.levelStars);
       }
       return {
+        ...state,
         levelStars: newArray,
       };
     }
     case LevelStarsActions.CLEAR_STARS: {
       return {
+        ...state,
         levelStars: INITIAL_LEVEL_STARS_STATE.levelStars,
       };
     }

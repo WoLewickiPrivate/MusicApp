@@ -36,7 +36,6 @@ const createSong = async (params: CreateSongParams): Promise<SequenceNote> => {
         },
       },
     );
-    console.warn(response);
     if (response.status >= 400) {
       return require('../static/sounds/output.json');
     }
@@ -62,7 +61,7 @@ const getToken = async (credentials: Credentials): Promise<string> => {
     const responseBody = await response.json();
     return responseBody['token'];
   } catch (error) {
-    throw new Error(error);
+    return '';
   }
 };
 

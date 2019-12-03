@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ImageBackground, Text } from 'react-native';
+import { View, ImageBackground, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
@@ -60,7 +60,7 @@ class Creds extends React.Component<Props, State> {
       );
       navigate('Main');
     } else {
-      this.setState({ text: 'Wrong credentials passed!' });
+      Alert.alert('Something went wrong!', 'Please try again');
     }
   };
 
@@ -75,9 +75,6 @@ class Creds extends React.Component<Props, State> {
         style={{ width: '100%', height: '100%' }}
       >
         <View style={styles.container}>
-          <Text style={{ height: 40, backgroundColor: 'silver' }}>
-            {this.state.text}
-          </Text>
           <TextInput
             style={{
               height: 40,

@@ -27,6 +27,9 @@ class AuthLoadingScreen extends React.Component<Props> {
   tryLogin = async () => {
     if (this.props.credentials.login && this.props.credentials.password) {
       const token = await getToken(this.props.credentials);
+      if (!token) {
+        this.props.navigation.navigate('Auth');
+      }
       await prepareLevels(
         token,
         this.props.clearLevels,
