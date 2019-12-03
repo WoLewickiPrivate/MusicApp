@@ -1,16 +1,15 @@
 import React, { Fragment } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
-import { View, ImageBackground, Button } from 'react-native';
+import { View, ImageBackground } from 'react-native';
 
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 
 import { RootReducerState } from '../../../redux/RootReducer';
 import styles from '../../../styles/Menu/MenuMainStyle';
 import LevelButton from '../../Buttons/LevelButton';
-import { getToken } from '../../../networking/ServerConnector';
+import { LevelStars, mapIdToStars } from '../../../utils/levelMappings';
+import { getToken, fetchNotes } from '../../../networking/ServerConnector';
 import { getLevelNotes } from '../../../utils/midiConverter';
-import { addLevelNotes } from '../../../redux/LevelNotesActions';
 
 interface OwnProps {
   navigation: Navigation;
@@ -37,23 +36,9 @@ class StartGameMenu extends React.Component<Props, State> {
     token: '',
   };
 
-  static getDerivedStateFromProps(props: Props, state: any) {
-    const levels = StartGameMenu.makeLevels(props.levelStars);
-    if (levels !== state.levels) {
-      return {
-        levels,
-      };
-    }
-    return null;
-  }
-
   async goToLevel(levelNumber: number, levelStars: number) {
-    const noteSequence = await getLevelNotes(
-      levelNumber,
-      this.state.token,
-      this.props.levelNotes,
-      this.props.addNotes,
-    );
+    const notes = await fetchNotes(levelNumber, this.state.token);
+    const noteSequence = getLevelNotes(notes);
     this.props.navigation.navigate('Level', {
       levelStars,
       levelNumber,
@@ -61,21 +46,18 @@ class StartGameMenu extends React.Component<Props, State> {
     });
   }
 
-  static makeLevels(levelStars: number[]): Level[] {
+  makeLevels(): Level[] {
     const levels: Level[] = [];
     // add levelStars to Reducer after adding level, there will be dispatch method to make it work somehow
-    for (let i = 1; i < levelStars.length; i++) {
-      levels.push({
-        levelNumber: i,
-        name: 'Level',
-        levelStars: levelStars[i],
-      });
+    for (const level of this.props.levelInfos) {
+      if (level.level === this.props.navigation.getParam('difficulty', 'Easy'))
+        levels.push({
+          levelNumber: level.id,
+          name: level.name,
+          levelStars: mapIdToStars(level.id, this.props.levelStars),
+        });
     }
     return levels;
-  }
-
-  async click() {
-    const rest = await getLevelNotes(10, this.state.token);
   }
 
   renderLevelButtons() {
@@ -83,9 +65,7 @@ class StartGameMenu extends React.Component<Props, State> {
       return (
         <Fragment key={index}>
           <LevelButton
-            disabled={this.state.stars < (levelNumber - 1) * 2}
             stars={levelStars}
-            levelNumber={levelNumber}
             name={name}
             onPress={async () => await this.goToLevel(levelNumber, levelStars)}
           />
@@ -95,8 +75,8 @@ class StartGameMenu extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    const token = await getToken();
-    const levels = StartGameMenu.makeLevels(this.props.levelStars);
+    const levels = this.makeLevels();
+    const token = await getToken(this.props.credentials);
     this.setState({
       levels,
       stars: this.props.levelStars.reduce(this.sumElems, 0),
@@ -104,8 +84,8 @@ class StartGameMenu extends React.Component<Props, State> {
     });
   }
 
-  sumElems(total: number, current: number) {
-    return total + current;
+  sumElems(total: number, current: LevelStars) {
+    return total + current.high_score;
   }
 
   render() {
@@ -114,7 +94,6 @@ class StartGameMenu extends React.Component<Props, State> {
         source={require('../../../static/backgroundImages/pianoMain.jpg')}
         style={{ width: '100%', height: '100%' }}
       >
-        <Button title="click" onPress={async () => this.click()} />
         <ScrollView>
           <View style={styles.container}>{this.renderLevelButtons()}</View>
         </ScrollView>
@@ -123,26 +102,17 @@ class StartGameMenu extends React.Component<Props, State> {
   }
 }
 
-type ReduxProps = ReturnType<typeof mapStateToProps> &
-  ReturnType<typeof mapDispatchToProps>;
+type ReduxProps = ReturnType<typeof mapStateToProps>;
 
 const mapStateToProps = (state: RootReducerState) => {
   return {
-    levelStars: state.levelStars.levelStarsCount,
-    levelNotes: state.levelNotes.levelNotes,
-  };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch) => {
-  return {
-    addNotes: (notesSpec: {
-      noteSequence: SequenceNote;
-      levelNumber: number;
-    }) => dispatch(addLevelNotes(notesSpec)),
+    credentials: state.credentials.credentials,
+    levelStars: state.levelStars.levelStars,
+    levelInfos: state.levelInfos.levelInfos,
   };
 };
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  null,
 )(StartGameMenu);

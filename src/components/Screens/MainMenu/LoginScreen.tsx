@@ -8,7 +8,7 @@ interface Props {
   navigation: Navigation;
 }
 
-export default class MenuScreen extends React.Component<Props> {
+export default class LoginScreen extends React.Component<Props> {
   backgroundImage: any;
   componentWillMount() {
     this.backgroundImage = require('../../../static/backgroundImages/pianoMain.jpg');
@@ -21,15 +21,8 @@ export default class MenuScreen extends React.Component<Props> {
         style={{ width: '100%', height: '100%' }}
       >
         <View style={styles.container}>
-          <MenuButton
-            text="Start game"
-            onPress={() => navigate('GameDifficultyMenu')}
-          />
-          <MenuButton
-            text="Start tutorial"
-            onPress={() => navigate('TutorialMenu')}
-          />
-          <MenuButton text="Settings" onPress={() => navigate('Settings')} />
+          <MenuButton text="Login" onPress={() => navigate('Credentials')} />
+          <MenuButton text="Register" onPress={() => navigate('Register')} />
         </View>
       </ImageBackground>
     );

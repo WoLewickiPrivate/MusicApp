@@ -22,14 +22,19 @@ export default class MenuScreen extends React.Component<Props> {
       >
         <View style={styles.container}>
           <MenuButton
-            text="Start game"
-            onPress={() => navigate('GameDifficultyMenu')}
+            text="Easy levels"
+            onPress={() => navigate('StartGameMenu', { difficulty: 'Easy' })}
           />
           <MenuButton
-            text="Start tutorial"
-            onPress={() => navigate('TutorialMenu')}
+            text="Medium levels"
+            onPress={() => navigate('StartGameMenu', { difficulty: 'Medium' })}
           />
-          <MenuButton text="Settings" onPress={() => navigate('Settings')} />
+          <MenuButton
+            text="Difficult levels"
+            onPress={() =>
+              navigate('StartGameMenu', { difficulty: 'Difficult' })
+            }
+          />
         </View>
       </ImageBackground>
     );

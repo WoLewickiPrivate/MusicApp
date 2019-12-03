@@ -1,22 +1,17 @@
 import { LevelStarsActions } from './LevelStarsActions';
+import { LevelStars } from '../utils/levelMappings';
 
 export interface LevelStarsReducerState {
-  levelStarsCount: Array<number>;
-}
-
-export interface LevelSpec {
-  levelNumber: number;
-  starsGained: number;
+  levelStars: LevelStars[];
 }
 
 const INITIAL_LEVEL_STARS_STATE: LevelStarsReducerState = {
-  // first one is never used cause there is no level 0
-  levelStarsCount: Array<number>(21).fill(0),
+  levelStars: new Array<LevelStars>(0),
 };
 
 interface LevelStarsAction {
   type: LevelStarsActions;
-  levelSpec: LevelSpec;
+  levelStars: LevelStars;
 }
 
 export const levelStarsReducer = (
@@ -24,11 +19,27 @@ export const levelStarsReducer = (
   action: LevelStarsAction,
 ) => {
   switch (action.type) {
-    case LevelStarsActions.ADD_STARS_TO_LEVEL: {
-      let newArray: number[] = state.levelStarsCount.slice();
-      newArray[action.levelSpec.levelNumber] = action.levelSpec.starsGained;
+    case LevelStarsActions.CHANGE_LEVEL_STARS: {
+      const newArray: LevelStars[] = state.levelStars.slice();
+      let didFind = false;
+      for (let levelStars of newArray) {
+        if (levelStars.song_id === action.levelStars.song_id) {
+          didFind = true;
+          levelStars.high_score = action.levelStars.high_score;
+        }
+      }
+      if (!didFind) {
+        newArray.push(action.levelStars);
+      }
       return {
-        levelStarsCount: newArray,
+        ...state,
+        levelStars: newArray,
+      };
+    }
+    case LevelStarsActions.CLEAR_STARS: {
+      return {
+        ...state,
+        levelStars: INITIAL_LEVEL_STARS_STATE.levelStars,
       };
     }
     default: {
