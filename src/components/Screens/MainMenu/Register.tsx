@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ImageBackground, Alert } from 'react-native';
+import { View, ImageBackground, Alert, StyleSheet } from 'react-native';
 
 import styles from '../../../styles/Menu/MenuMainStyle';
 
@@ -64,66 +64,31 @@ export default class Register extends React.Component<Props, State> {
       >
         <View style={styles.container}>
           <TextInput
-            style={{
-              height: 40,
-              borderColor: 'powderblue',
-              borderWidth: 1,
-              borderBottomWidth: 3,
-              width: 300,
-              backgroundColor: 'silver',
-            }}
+            style={style_tweaks.input_style}
             placeholder="Login"
             value={this.state.login}
             onChangeText={this.handleLoginChange}
           />
           <TextInput
-            style={{
-              height: 40,
-              borderColor: 'powderblue',
-              borderWidth: 1,
-              borderBottomWidth: 3,
-              width: 300,
-              backgroundColor: 'silver',
-            }}
+            style={style_tweaks.input_style}
             placeholder="Password"
             value={this.state.password}
             onChangeText={this.handlePasswordChange}
           />
           <TextInput
-            style={{
-              height: 40,
-              borderColor: 'powderblue',
-              borderWidth: 1,
-              borderBottomWidth: 3,
-              width: 300,
-              backgroundColor: 'silver',
-            }}
+            style={style_tweaks.input_style}
             placeholder="Email"
             value={this.state.email}
             onChangeText={this.handleEmailChange}
           />
           <TextInput
-            style={{
-              height: 40,
-              borderColor: 'powderblue',
-              borderWidth: 1,
-              borderBottomWidth: 3,
-              width: 300,
-              backgroundColor: 'silver',
-            }}
+            style={style_tweaks.input_style}
             placeholder="First Name"
             value={this.state.firstName}
             onChangeText={this.handleFirstNameChange}
           />
           <TextInput
-            style={{
-              height: 40,
-              borderColor: 'powderblue',
-              borderWidth: 1,
-              borderBottomWidth: 3,
-              width: 300,
-              backgroundColor: 'silver',
-            }}
+            style={style_tweaks.input_style}
             placeholder="Last Name"
             value={this.state.lastName}
             onChangeText={this.handleLastNameChange}
@@ -137,3 +102,17 @@ export default class Register extends React.Component<Props, State> {
     );
   }
 }
+
+const style_tweaks = StyleSheet.create({
+  input_style: {
+    marginBottom: 15,
+    paddingLeft: 25,
+    height: 50,
+    width: 300,
+    borderRadius: 25,
+    backgroundColor: 'white',
+    borderColor: 'powderblue',
+    borderWidth: 1,
+    color: 'silver',
+  },
+});
