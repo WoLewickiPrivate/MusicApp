@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ImageBackground, Alert } from 'react-native';
+import { View, ImageBackground, Alert, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
@@ -76,27 +76,13 @@ class Creds extends React.Component<Props, State> {
       >
         <View style={styles.container}>
           <TextInput
-            style={{
-              height: 40,
-              borderColor: 'powderblue',
-              borderWidth: 1,
-              borderBottomWidth: 3,
-              width: 300,
-              backgroundColor: 'silver',
-            }}
+            style={style_tweaks.input_style}
             value={this.state.login}
             placeholder="Login"
             onChangeText={this.handleLoginChange}
           />
           <TextInput
-            style={{
-              height: 40,
-              borderColor: 'powderblue',
-              borderWidth: 1,
-              borderBottomWidth: 3,
-              width: 300,
-              backgroundColor: 'silver',
-            }}
+            style={style_tweaks.input_style}
             placeholder="Password"
             value={this.state.password}
             onChangeText={this.handlePasswordChange}
@@ -121,6 +107,20 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
       dispatch(changeCredentials(credentials)),
   };
 };
+
+const style_tweaks = StyleSheet.create({
+  input_style: {
+    marginBottom: 15,
+    paddingLeft: 25,
+    height: 50,
+    width: 300,
+    borderRadius: 25,
+    backgroundColor: 'white',
+    borderColor: 'powderblue',
+    borderWidth: 1,
+    color: 'silver',
+  },
+});
 
 export default connect(
   null,
