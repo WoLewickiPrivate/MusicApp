@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
-import { View, ImageBackground } from 'react-native';
+import { View, ImageBackground, Button } from 'react-native';
 
 import { connect } from 'react-redux';
 
@@ -8,7 +8,11 @@ import { RootReducerState } from '../../../redux/RootReducer';
 import styles from '../../../styles/Menu/MenuMainStyle';
 import LevelButton from '../../Buttons/LevelButton';
 import { LevelStars, mapIdToStars } from '../../../utils/levelMappings';
-import { getToken, fetchNotes } from '../../../networking/ServerConnector';
+import {
+  getToken,
+  fetchNotes,
+  sendLevelStatistics,
+} from '../../../networking/ServerConnector';
 import { getLevelNotes } from '../../../utils/midiConverter';
 
 interface OwnProps {
@@ -43,6 +47,7 @@ class StartGameMenu extends React.Component<Props, State> {
       levelStars,
       levelNumber,
       noteSequence,
+      token: this.state.token,
     });
   }
 

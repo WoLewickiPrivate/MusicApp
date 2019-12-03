@@ -5,7 +5,6 @@ import {
   DeviceEventEmitter,
   Easing,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import { connect } from 'react-redux';
@@ -23,6 +22,7 @@ import Board from './Board';
 import EndGamePopup from './EndGamePopup';
 import StrikeDisplayer from './StrikeDisplayer';
 import { LevelStars } from '../../../utils/levelMappings';
+import { sendLevelStatistics } from '../../../networking/ServerConnector';
 
 interface OwnProps {
   navigation: Navigation;
@@ -38,6 +38,7 @@ interface State {
   didGameEnd: boolean;
   didGameStart: boolean;
   didLevelLoad: boolean;
+  token: string;
 }
 
 class Level extends React.Component<Props, State> {
@@ -49,19 +50,22 @@ class Level extends React.Component<Props, State> {
     didGameEnd: false,
     didGameStart: false,
     didLevelLoad: false,
+    token: this.props.navigation.getParam('token', ''),
   };
 
   brickUnitLength: number = 50;
   firstNote: string = 'a4';
   lastNote: string = 'g4';
   intervalID: any = null;
-  starsGained: number = 0;
+  starsGained: number = this.props.navigation.getParam('levelStars', 0);
   //@ts-ignore
   ws = new WebSocket('ws://192.168.1.13:8765');
   changePointsMap: Array<Array<{ start: number; end: number }>> = [];
   noteStack: Array<MidiElement> = [];
   longestStrike: number = 0;
   strike: number = 0;
+  timestamp = 0;
+  isTraining = this.props.navigation.getParam('isTraining', false);
 
   moveNotes() {
     Animated.timing(this.state.movingVal, {
@@ -73,7 +77,7 @@ class Level extends React.Component<Props, State> {
       easing: Easing.inOut(Easing.linear),
     }).start(() => {
       this.longestStrike = Math.max(this.strike, this.longestStrike);
-      if (!this.isTrainingLevel()) {
+      if (!this.isTraining) {
         this.addStars();
       }
       this.cleanUp();
@@ -190,20 +194,13 @@ class Level extends React.Component<Props, State> {
     });
   }
 
-  isTrainingLevel() {
-    return this.props.navigation.getParam('isTraining', false);
-  }
-
   addStars() {
-    this.starsGained = countGainedStars(
+    const stars = countGainedStars(
       this.longestStrike,
       this.state.notes.midisArray.length,
     );
-    if (this.state.levelStars < this.starsGained) {
-      this.props.addStarsToLevel({
-        song_id: this.props.navigation.getParam('levelNumber'),
-        high_score: this.starsGained,
-      });
+    if (stars > this.starsGained) {
+      this.starsGained = stars;
     }
   }
 
@@ -245,10 +242,28 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    this.timestamp = new Date().getMinutes();
     this.startGame();
   }
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
+    const practice_time = Math.floor(new Date().getMinutes() - this.timestamp);
+    if (this.state.levelStars < this.starsGained) {
+      this.props.addStarsToLevel({
+        song_id: this.props.navigation.getParam('levelNumber'),
+        high_score: this.starsGained,
+      });
+    }
+    console.warn(
+      practice_time,
+      this.starsGained,
+      this.props.navigation.getParam('levelNumber'),
+    );
+    await sendLevelStatistics(this.state.token, {
+      song_id: this.props.navigation.getParam('levelNumber'),
+      practice_time,
+      high_score: this.starsGained,
+    });
     this.ws.close();
   }
 
@@ -274,6 +289,7 @@ class Level extends React.Component<Props, State> {
           doTraining={() => {
             // TODO fetch new song
             this.setState({ didGameEnd: false, didGameStart: false });
+            this.isTraining = true;
             this.startGame();
           }}
         />

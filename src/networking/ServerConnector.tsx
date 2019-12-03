@@ -7,6 +7,12 @@ export interface CreateSongParams {
   token: string;
 }
 
+export interface SongStatsParams {
+  song_id: number;
+  practice_time: number;
+  high_score: number;
+}
+
 const serverApi = 'https://musicapp-bck.herokuapp.com/';
 
 const getSong = async (endpoint: string): Promise<SequenceNote> => {
@@ -170,7 +176,7 @@ const fetchLevels = async (token: string) => {
     if (response.status >= 400) {
       return [];
     }
-    return response.json();
+    return await response.json();
   } catch (error) {
     return [];
   }
@@ -189,10 +195,30 @@ const fetchUserStars = async (token: string) => {
     if (response.status >= 400) {
       return [];
     }
-    return response.json();
+    return await response.json();
   } catch (error) {
     return [];
   }
+};
+
+const sendLevelStatistics = async (token: string, stats: SongStatsParams) => {
+  try {
+    const response = await fetch(
+      `${serverApi}songstats/?song_id=${stats.song_id}&practice_time=${stats.practice_time}&high_score=${stats.high_score}`,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    if (response.status >= 400) {
+      return;
+    }
+    return await response.json();
+  } catch (error) {}
 };
 
 export {
@@ -204,4 +230,5 @@ export {
   tryRegister,
   fetchLevels,
   fetchUserStars,
+  sendLevelStatistics,
 };
