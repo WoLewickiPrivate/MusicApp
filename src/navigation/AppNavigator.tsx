@@ -62,12 +62,6 @@ const config = {
   defaultNavigationOptions: navOptions,
 };
 
-const AuthStackNavigator = createStackNavigator({
-  Login: { screen: LoginScreen },
-  Credentials: { screen: Credentials },
-  Register: { screen: Register },
-});
-
 const MainStackNavigator = createStackNavigator(
   {
     Menu: { screen: MenuScreen },
@@ -80,6 +74,27 @@ const MainStackNavigator = createStackNavigator(
   },
   // @ts-ignore
   config,
+);
+
+const authNavOptions = {
+  headerStyle: {
+    backgroundColor: 'powderblue',
+  },
+};
+
+const authConfig = {
+  headerLayoutPreset: 'center',
+  defaultNavigationOptions: authNavOptions,
+};
+
+const AuthStackNavigator = createStackNavigator(
+  {
+    Login: { screen: LoginScreen },
+    Credentials: { screen: Credentials },
+    Register: { screen: Register },
+  },
+  // @ts-ignore
+  authConfig,
 );
 
 const SwitchNavigator = createSwitchNavigator(
