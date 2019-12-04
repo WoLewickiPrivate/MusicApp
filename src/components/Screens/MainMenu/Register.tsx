@@ -26,7 +26,6 @@ export default class Register extends React.Component<Props, State> {
     firstName: '',
     lastName: '',
     password: '',
-    text: '',
   };
 
   handleLoginChange = (login: string) => this.setState({ login });

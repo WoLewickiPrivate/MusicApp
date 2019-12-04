@@ -27,14 +27,12 @@ type Props = OwnProps & ReduxProps;
 interface State {
   login: string;
   password: string;
-  text: string;
 }
 
 class Creds extends React.Component<Props, State> {
   readonly state: State = {
     login: '',
     password: '',
-    text: '',
   };
 
   handleLoginChange = (login: string) => this.setState({ login });

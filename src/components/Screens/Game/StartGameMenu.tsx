@@ -43,6 +43,7 @@ class StartGameMenu extends React.Component<Props, State> {
       levelStars,
       levelNumber,
       noteSequence,
+      token: this.state.token,
     });
   }
 

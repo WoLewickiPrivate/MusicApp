@@ -1,5 +1,10 @@
 import React from 'react';
-import { ActivityIndicator, StatusBar, View } from 'react-native';
+import {
+  ActivityIndicator,
+  StatusBar,
+  View,
+  ImageBackground,
+} from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
@@ -45,10 +50,15 @@ class AuthLoadingScreen extends React.Component<Props> {
 
   render() {
     return (
-      <View>
-        <ActivityIndicator />
-        <StatusBar barStyle="default" />
-      </View>
+      <ImageBackground
+        source={require('../../../static/backgroundImages/pianoMain.jpg')}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <StatusBar barStyle="default" />
+        </View>
+      </ImageBackground>
     );
   }
 }

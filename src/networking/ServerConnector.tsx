@@ -7,31 +7,23 @@ export interface CreateSongParams {
   token: string;
 }
 
-const serverApi = 'https://musicapp-bck.herokuapp.com/';
+export interface SongStatsParams {
+  song_id: number;
+  practice_time: number;
+  high_score: number;
+}
 
-const getSong = async (endpoint: string): Promise<SequenceNote> => {
-  try {
-    const response = await fetch(`${serverApi}${endpoint}`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.status as SequenceNote;
-  } catch (error) {
-    throw Error(error);
-  }
-};
+const serverApi = 'https://musicapp-bck.herokuapp.com/';
 
 const createSong = async (params: CreateSongParams): Promise<SequenceNote> => {
   try {
     const response = await fetch(
-      `${serverApi}songs/create_song?song_id=${params.id}&start_time=${params.startTime}&stop_time=${params.stopTime}/`,
+      `${serverApi}songs/create_song/?song_id=${params.id}&start_time=${params.startTime}&stop_time=${params.stopTime}`,
       {
         method: 'GET',
         headers: {
-          Accept: '*/*',
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${params.token}`,
         },
       },
@@ -39,7 +31,7 @@ const createSong = async (params: CreateSongParams): Promise<SequenceNote> => {
     if (response.status >= 400) {
       return require('../static/sounds/output.json');
     }
-    return response as SequenceNote;
+    return await response.json();
   } catch (error) {
     return require('../static/sounds/output.json');
   }
@@ -170,7 +162,7 @@ const fetchLevels = async (token: string) => {
     if (response.status >= 400) {
       return [];
     }
-    return response.json();
+    return await response.json();
   } catch (error) {
     return [];
   }
@@ -189,14 +181,33 @@ const fetchUserStars = async (token: string) => {
     if (response.status >= 400) {
       return [];
     }
-    return response.json();
+    return await response.json();
   } catch (error) {
     return [];
   }
 };
 
+const sendLevelStatistics = async (token: string, stats: SongStatsParams) => {
+  try {
+    const response = await fetch(
+      `${serverApi}songstats/?song_id=${stats.song_id}&practice_time=${stats.practice_time}&high_score=${stats.high_score}`,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    if (response.status >= 400) {
+      return;
+    }
+    return await response.json();
+  } catch (error) {}
+};
+
 export {
-  getSong,
   getToken,
   createSong,
   fetchNotes,
@@ -204,4 +215,5 @@ export {
   tryRegister,
   fetchLevels,
   fetchUserStars,
+  sendLevelStatistics,
 };
