@@ -20,14 +20,16 @@ async function prepareLevels(
   changeStarsOfLevel: (levelStars: LevelStars) => void,
 ): Promise<void> {
   const levels: LevelInfo[] = await fetchLevels(token);
-  clearLevels();
-  clearStars();
-  for (const levelInfo of levels) {
-    addLevel(levelInfo);
-  }
-  const levelsStars: LevelStars[] = await fetchUserStars(token);
-  for (const stars of levelsStars) {
-    changeStarsOfLevel(stars);
+  if (levels !== []) {
+    clearLevels();
+    clearStars();
+    for (const levelInfo of levels) {
+      addLevel(levelInfo);
+    }
+    const levelsStars: LevelStars[] = await fetchUserStars(token);
+    for (const stars of levelsStars) {
+      changeStarsOfLevel(stars);
+    }
   }
 }
 
