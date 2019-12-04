@@ -16,7 +16,6 @@ interface Props {
 
 interface State {
   noteRange: any;
-  midis: Array<any>;
 }
 export default class Board extends Component<Props, State> {
   state = {
@@ -24,20 +23,18 @@ export default class Board extends Component<Props, State> {
       first: MidiNumbers.fromNote('c4'),
       last: MidiNumbers.fromNote('e5'),
     },
-    midis: [],
   };
 
   unitLength = this.props.unitLength;
 
   componentDidMount() {
-    const { noteRange, midis } = this.props;
+    const { noteRange } = this.props;
 
     this.setState({
       noteRange: {
         first: MidiNumbers.fromNote(noteRange.first),
         last: MidiNumbers.fromNote(noteRange.last),
       },
-      midis: midis,
     });
   }
 
@@ -71,7 +68,7 @@ export default class Board extends Component<Props, State> {
   }
 
   generateNotes(naturalKeyWidth: number) {
-    return this.state.midis.map((element: MidiElement, index) => {
+    return this.props.midis.map((element: MidiElement, index) => {
       const pitch = element.pitch;
       const { isAccidental } = MidiNumbers.getAttributes(pitch);
       return (
