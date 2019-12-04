@@ -34,15 +34,16 @@ class AuthLoadingScreen extends React.Component<Props> {
       const token = await getToken(this.props.credentials);
       if (!token) {
         this.props.navigation.navigate('Auth');
+      } else {
+        await prepareLevels(
+          token,
+          this.props.clearLevels,
+          this.props.clearStars,
+          this.props.addLevelInfo,
+          this.props.addLevelStars,
+        );
+        this.props.navigation.navigate('Main');
       }
-      await prepareLevels(
-        token,
-        this.props.clearLevels,
-        this.props.clearStars,
-        this.props.addLevelInfo,
-        this.props.addLevelStars,
-      );
-      this.props.navigation.navigate('Main');
     } else {
       this.props.navigation.navigate('Auth');
     }
