@@ -25,7 +25,6 @@ function arraysEqual(a: any[], b: any[]) {
 
 function countGainedStars(longestStrike: number, noteCount: number): number {
   const starsGained = Math.floor(((longestStrike / noteCount) * 10) / 3);
-  return 3;
   return starsGained;
 }
 

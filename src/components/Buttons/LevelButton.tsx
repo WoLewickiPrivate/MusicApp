@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Image, View } from 'react-native';
 
 interface Props {
   onPress: () => void;
@@ -23,7 +23,9 @@ export default class LevelButton extends React.Component<Props> {
     return (
       <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
         <Text style={styles.buttonText}>{this.props.name}</Text>
-        {this.renderLevelStars()}
+        <View style={{ flexDirection: 'row', marginRight: 30 }}>
+          {this.renderLevelStars()}
+        </View>
       </TouchableOpacity>
     );
   }
@@ -37,12 +39,13 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     marginVertical: 10,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   buttonText: {
     fontSize: 16,
     fontWeight: '500',
     color: '#ffffff',
-    textAlign: 'center',
+    textAlign: 'left',
+    marginLeft: 30,
   },
 });

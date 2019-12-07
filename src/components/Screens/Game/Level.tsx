@@ -245,7 +245,6 @@ class Level extends React.Component<Props, State> {
 
   componentDidMount() {
     this.timestamp = new Date().getMinutes();
-    // this.startGame();
   }
 
   async componentWillUnmount() {
@@ -256,11 +255,6 @@ class Level extends React.Component<Props, State> {
         high_score: this.starsGained,
       });
     }
-    console.warn(
-      practice_time,
-      this.starsGained,
-      this.props.navigation.getParam('levelNumber'),
-    );
     await sendLevelStatistics(this.state.token, {
       song_id: this.props.navigation.getParam('levelNumber'),
       practice_time,
