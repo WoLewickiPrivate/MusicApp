@@ -26,6 +26,7 @@ import {
   sendLevelStatistics,
   createSong,
 } from '../../../networking/ServerConnector';
+import { findWorstInterval } from './utils/scoreProcessor';
 
 interface OwnProps {
   navigation: Navigation;
@@ -63,8 +64,8 @@ class Level extends React.Component<Props, State> {
   starsGained: number = this.props.navigation.getParam('levelStars', 0);
   //@ts-ignore
   ws = new WebSocket('ws://192.168.1.13:8765');
-  changePointsMap: Array<Array<{ start: number; end: number }>> = [];
   noteStack: Array<MidiElement> = [];
+  noteMask: Array<{ start: number; end: number; value: boolean }> = [];
   longestStrike: number = 0;
   strike: number = 0;
   timestamp = 0;
@@ -76,7 +77,7 @@ class Level extends React.Component<Props, State> {
         this.state.notes.totalDuration,
         this.brickUnitLength,
       ),
-      duration: this.state.notes.totalDuration * 1000,
+      duration: 5000,
       easing: Easing.inOut(Easing.linear),
     }).start(() => {
       this.longestStrike = Math.max(this.strike, this.longestStrike);
@@ -124,6 +125,11 @@ class Level extends React.Component<Props, State> {
             this.noteStack[0],
           ];
         }
+        this.noteMask.push({
+          start: this.noteStack[0].start,
+          end: this.noteStack[0].end,
+          value: true,
+        });
         this.noteStack.shift();
         this.strike += 1;
         this.updateStrike();
@@ -165,6 +171,11 @@ class Level extends React.Component<Props, State> {
           this.longestStrike = Math.max(this.strike, this.longestStrike);
           this.resetStrike();
         }
+        this.noteMask.push({
+          start: this.noteStack[0].start,
+          end: this.noteStack[0].end,
+          value: false,
+        });
         this.noteStack.shift();
       }
     });
@@ -178,13 +189,6 @@ class Level extends React.Component<Props, State> {
 
   getMidiIndex() {
     return Math.trunc(this.state.movingVal._value);
-  }
-
-  getPianoRangeArray(
-    firstMidi: number,
-    lastMidi: number,
-  ): Array<Array<{ start: number; end: number }>> {
-    return range(firstMidi, lastMidi + 1).map(() => []);
   }
 
   initNoteStack() {
@@ -244,6 +248,7 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    console.warn(this.state.notes.totalDuration);
     this.timestamp = new Date().getMinutes();
   }
 
@@ -283,10 +288,13 @@ class Level extends React.Component<Props, State> {
             this.props.navigation.goBack();
           }}
           doTraining={async () => {
+            const worstInterval = findWorstInterval(this.noteMask).map(
+              value => value / this.brickUnitLength,
+            );
             const noteSequence = await createSong({
               id: this.props.navigation.getParam('levelNumber'),
-              startTime: '5.2',
-              stopTime: '12.3',
+              startTime: worstInterval[0].toString(),
+              stopTime: worstInterval[1].toString(),
               token: this.state.token,
             });
             const newNotes = getLevelNotes(noteSequence);
