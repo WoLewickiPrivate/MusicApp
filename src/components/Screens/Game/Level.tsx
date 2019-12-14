@@ -77,7 +77,7 @@ class Level extends React.Component<Props, State> {
         this.state.notes.totalDuration,
         this.brickUnitLength,
       ),
-      duration: 5000,
+      duration: this.state.notes.totalDuration * 1000,
       easing: Easing.inOut(Easing.linear),
     }).start(() => {
       this.longestStrike = Math.max(this.strike, this.longestStrike);
@@ -248,7 +248,6 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    console.warn(this.state.notes.totalDuration);
     this.timestamp = new Date().getMinutes();
   }
 
