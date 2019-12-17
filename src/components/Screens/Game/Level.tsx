@@ -27,6 +27,7 @@ import {
   createSong,
 } from '../../../networking/ServerConnector';
 import { findWorstInterval } from './utils/scoreProcessor';
+import { setUpMidi } from 'react-native-sound-module';
 
 interface OwnProps {
   navigation: Navigation;
@@ -248,6 +249,10 @@ class Level extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    setUpMidi(
+      (note: number) => this.touchKey(note),
+      (note: number) => this.releaseKey(note),
+    );
     this.timestamp = new Date().getMinutes();
   }
 

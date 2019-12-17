@@ -35,9 +35,12 @@ export default class Tutorial extends React.Component<State> {
   };
 
   generateRandomNotes() {
+    const NOTE_RANGE = 10;
+    const FIRST_NOTE = 60;
+
     let randomArray: Array<number> = [];
     while (randomArray.length != 3) {
-      let randomNote = Math.floor(Math.random() * 10 + 60);
+      let randomNote = Math.floor(Math.random() * NOTE_RANGE + FIRST_NOTE);
       if (randomArray.includes(randomNote)) {
         continue;
       }
