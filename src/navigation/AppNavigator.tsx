@@ -16,6 +16,7 @@ import Tutorial from '../components/Screens/Tutorial/Tutorial';
 import TutorialMenu from '../components/Screens/Tutorial/TutorialMenu';
 import LoginScreen from '../components/Screens/MainMenu/LoginScreen';
 import AuthLoadingScreen from '../components/Screens/MainMenu/AuthLoading';
+import IntervalsQuiz from '../components/Screens/Tutorial/IntervalsQuiz';
 import { RootReducerState } from '../redux/RootReducer';
 import { LevelStars } from '../utils/levelMappings';
 
@@ -69,6 +70,7 @@ const MainStackNavigator = createStackNavigator(
     GameDifficultyMenu: { screen: GameDifficultyMenu },
     TutorialMenu: { screen: TutorialMenu },
     Tutorial: { screen: Tutorial },
+    IntervalsQuiz: { screen: IntervalsQuiz },
     StartGameMenu: { screen: StartGameMenu },
     Level: { screen: Level },
   },

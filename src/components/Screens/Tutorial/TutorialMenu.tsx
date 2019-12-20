@@ -18,6 +18,10 @@ export default class TutorialMenu extends React.Component<Props> {
       >
         <View style={styles.container}>
           <MenuButton text="Note quiz" onPress={() => navigate('Tutorial')} />
+          <MenuButton
+            text="Intervals quiz"
+            onPress={() => navigate('IntervalsQuiz')}
+          />
         </View>
       </ImageBackground>
     );
